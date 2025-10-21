@@ -6,6 +6,8 @@ body {
   margin: 0;
   padding: 0;
 }
+/* General page styling */
+
 
 /* Title code */
 .page-header {
@@ -28,6 +30,7 @@ body {
 }
 /* Title code */
 
+
 /* Container */
 .form-container {
   max-width: 800px;
@@ -37,6 +40,8 @@ body {
   border-radius: 12px;
   box-shadow: 0px 0px 15px rgba(0, 0, 50, 0.4);
 }
+/* Container */
+
 
 /* Title */
 .form-container h1 {
@@ -44,6 +49,8 @@ body {
   margin-bottom: 25px;
   color: #0071ce;
 }
+/* Title */
+
 
 /* Section titles */
 .form-container h2 {
@@ -53,6 +60,8 @@ body {
   border-bottom: 1px solid #000000;
   padding-bottom: 5px;
 }
+/* Section titles */
+
 
 /* Label & Input styling */
 .form-group {
@@ -83,8 +92,9 @@ input[type="text"]:focus {
   border-color: #000000;
   box-shadow: 0 0 6px #60a5fa;
 }
+/* Label & Input styling */
 
-/* Buttons */
+/* all Buttons */
 button {
   padding: 10px 15px;
   margin-top: 15px;
@@ -128,6 +138,8 @@ button {
 .update-btn:hover {
   background-color: #002f6c;
 }
+/* all Buttons */
+
 
 /* Info and status text */
 .info-text {
@@ -141,3 +153,4 @@ button {
   font-weight: 500;
   color: #2445e7;
 }
+/* Info and status text */

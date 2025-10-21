@@ -31,29 +31,40 @@ export class ClassSchedule {
   private formBuilder = inject(FormBuilder);
 
   scheduleForm = this.formBuilder.group({
-    aliases: this.formBuilder.array([this.createAlias()])
+    classes: this.formBuilder.array([this.createClass()])
   });
 
-  get aliases(): FormArray {
-    return this.scheduleForm.get('aliases') as FormArray;
+  get classes(): FormArray {
+    return this.scheduleForm.get('classes') as FormArray;
   }
 
-  createAlias(): FormGroup {
+  createClass(): FormGroup {
     return this.formBuilder.group({
-      className: [''],
+      className: ['', Validators.required],
       professor: [''],
-      time: [''] 
+      time: ['', Validators.required],
+      day: ['', Validators.required]
     });
   }
 
-
-  addAlias(): void {
-    this.aliases.push(this.createAlias());
+  addclass(): void {
+    this.classes.push(this.createClass());
   }
 
-  removeAlias(index: number): void {
-    this.aliases.removeAt(index);
+  removeClass(index: number): void {
+    this.classes.removeAt(index);
   }
+
+   updateProfile() {
+  this.classes.controls.forEach(singleClass => {
+    singleClass.patchValue({
+      className: 'Nancy',
+      professor: 'Mr. Smith',
+      time: '10:00 AM',
+      day: 'Monday'
+    });
+  });
+}
 
   
 
