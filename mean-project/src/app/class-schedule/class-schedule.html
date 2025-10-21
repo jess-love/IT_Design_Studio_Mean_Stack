@@ -1,0 +1,51 @@
+<div class="page-header">
+    <h2>{{ subtitle() }}</h2> 
+    <h3>Please fill out your personal and address information</h3>
+</div>
+
+
+<div class="form-container">
+  <form [formGroup]="scheduleForm">
+    <h1>Schedule Form</h1>
+
+    <div formArrayName="aliases" class="alias-section">
+  <h2>Add Classes</h2>
+  <button type="button" class="add-btn" (click)="addAlias()">+ Add a class</button>
+
+  @for (alias of aliases.controls; track $index; let i = $index) {
+    <div [formGroupName]="i" class="form-group">
+      <label for="className-{{ i }}">Class Name</label>
+      <input id="className-{{ i }}" type="text" formControlName="className" />
+
+      <label for="professor-{{ i }}">Professor</label>
+      <input id="professor-{{ i }}" type="text" formControlName="professor" />
+
+      <label for="time-{{ i }}">Day</label>
+      <select id="time-{{ i }}" formControlName="time">
+        <option value="">Select a Day</option>
+        <option *ngFor="let day of daysOfWeek" [value]="day">{{ day }}</option>
+      </select>
+
+       <label for="time-{{ i }}">Time</label>
+       <select id="time-{{ i }}" formControlName="time">
+          <option value="">Select a Time</option>
+          <option *ngFor="let time of timesOfDay" [value]="time">{{ time }}</option>
+       </select>
+
+      <button type="button" (click)="this['removeAlias'](i)">Remove</button>
+
+    </div>
+  }
+</div>
+    <p class="info-text">Complete the form to enable button.</p>
+    <button class="submit-btn" type="submit" [disabled]="!scheduleForm.valid">
+      Submit
+    </button>
+
+    <p class="status">Form Status: {{ scheduleForm.status }}</p>
+
+    <button type="button" class="update-btn">
+      Update Schedule
+    </button>
+  </form>
+</div>
