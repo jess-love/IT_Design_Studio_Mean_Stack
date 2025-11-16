@@ -1,0 +1,24 @@
+<!-- <p>navigation-menu works!</p> -->
+
+<nav class="nav-bar">
+  <div class="nav-title">Scholar Path</div>
+
+  <div class="nav-menu">
+    <button mat-raised-button color="primary" [matMenuTriggerFor]="menu">
+      Menu
+    </button>
+
+    <mat-menu #menu="matMenu" class="custom-menu">
+      <!-- <button mat-menu-item routerLink="/listStudents">
+        📋 List Students
+      </button> -->
+      <button mat-menu-item routerLink="/home">
+        Home Page
+      </button>
+      <button mat-menu-item routerLink="/addClassSchedule">
+        ➕ Add Schedule
+      </button>
+    </mat-menu>
+  </div>
+</nav>
+

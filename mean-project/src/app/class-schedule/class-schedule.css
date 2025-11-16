@@ -154,3 +154,96 @@ button {
   color: #2445e7;
 }
 /* Info and status text */
+
+/* table of added schedules */
+.form-container {
+  max-width: 900px;
+  margin: 40px auto;
+  padding: 20px;
+  background-color: #f9f9f9;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  font-family: Arial, sans-serif;
+}
+
+
+.form-container h1 {
+  text-align: center;
+  margin-bottom: 20px;
+  color: #333;
+}
+
+
+.schedule-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 0 auto; /* center the table inside the div */
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+}
+
+
+.schedule-table thead {
+  background-color: #c9c9c9;
+  color: rgb(0, 0, 0);
+}
+
+.schedule-table th, 
+.schedule-table td {
+  text-align: center;
+  padding: 12px;
+  border: 1px solid #ddd;
+}
+
+
+.schedule-table tbody tr:nth-child(even) {
+  background-color: #f2f2f2;
+}
+
+.schedule-table tbody tr:hover {
+  background-color: #dfdfdf;
+  transition: 0.2s;
+}
+
+.schedule-table button {
+  padding: 6px 12px;
+  margin: 0 2px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: bold;
+  color: white;
+}
+
+.schedule-table button:hover {
+  opacity: 0.85;
+}
+
+.schedule-table button[type="button"] {
+  background-color: #2196F3;
+}
+
+.schedule-table button[type="button"]:last-child {
+  background-color: #f44336; 
+}
+
+.form-container p {
+  text-align: center;
+  font-style: italic;
+  color: #666;
+  margin-top: 15px;
+}
+/* table of added schedules */
+
+.message {
+  margin: 10px 0;
+  padding: 8px;
+  border-radius: 5px;
+  background-color: #d4edda; /* green background */
+  color: #155724; /* dark green text */
+  font-weight: bold;
+}
+
+.message.error {
+  background-color: #f8d7da; /* red background */
+  color: #721c24; /* dark red text */
+}

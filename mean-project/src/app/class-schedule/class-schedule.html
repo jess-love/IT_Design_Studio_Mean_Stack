@@ -1,48 +1,76 @@
 <div class="page-header">
-    <h2>{{ subtitle() }}</h2> 
-    <h3>Please fill out your personal and address information</h3>
+  <h2>{{ subtitle() }}</h2> 
+  <h3>Please fill out your class information</h3>
 </div>
 
 <div class="form-container">
-<form [formGroup]="scheduleForm">
-  <h1>Schedule Form</h1>
+  <form [formGroup]="classForm" (ngSubmit)="onSubmitOrAdd()">
 
-  <div formArrayName="classes" class="class-section">
-  @for (class of classes.controls; track $index; let i = $index) {
-    <div [formGroupName]="i" class="form-group">
-      <label for="className-{{ i }}">Class Name</label>
-      <input id="className-{{ i }}" type="text" formControlName="className" />
+    <h1>Schedule Form</h1>
 
-      <label for="professor-{{ i }}">Professor</label>
-      <input id="professor-{{ i }}" type="text" formControlName="professor" />
+    <div class="form-group">
+      <label for="className">Class Name</label>
+      <input id="className" type="text" formControlName="className" required />
 
-      <label for="time-{{ i }}">Day</label>
-      <select id="time-{{ i }}" formControlName="day">
+      <label for="professor">Professor</label>
+      <input id="professor" type="text" formControlName="professor" />
+
+      <label for="day">Day</label>
+      <select id="day" formControlName="day" required>
         <option value="">Select a Day</option>
         <option *ngFor="let day of daysOfWeek" [value]="day">{{ day }}</option>
       </select>
 
-       <label for="time-{{ i }}">Time</label>
-       <select id="time-{{ i }}" formControlName="time">
-          <option value="">Select a Time</option>
-          <option *ngFor="let time of timesOfDay" [value]="time">{{ time }}</option>
-       </select>
-      <button type="button" (click)="this['removeClass'](i)">Remove</button>
+      <label for="time">Time</label>
+      <select id="time" formControlName="time" required>
+        <option value="">Select a Time</option>
+        <option *ngFor="let time of timesOfDay" [value]="time">{{ time }}</option>
+      </select>
     </div>
-  }
-  
-  <button type="button" class="add-btn" (click)="addclass()">+ Add one more class</button>
+
+    <button class="submit-btn" type="submit" [disabled]="!classForm.valid">
+      {{ editIndex !== null ? 'Update Class' : 'Add Class' }}
+    </button>
+
+    <p class="status">Form Status: {{ classForm.status }}</p>
+  </form>
+
+  <div *ngIf="message()" class="message">
+    {{ message() }}
+  </div>
 </div>
 
-    <p class="info-text">Complete the form to enable button.</p>
-    <button class="submit-btn" type="submit" [disabled]="!scheduleForm.valid">
-      Submit
-    </button>
+<!-- Class Schedule List -->
+<div class="form-container">
+  <h1>Class Schedules</h1>
 
-    <p class="status">Form Status: {{ scheduleForm.status }}</p>
+  <table *ngIf="classSchedules && classSchedules.length > 0; else noData" border="1" class="schedule-table">
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>Class Name</th>
+        <th>Professor</th>
+        <th>Day</th>
+        <th>Time</th>
+        <th>Action</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let classSchedule of classSchedules; let i = index">
+        <td>{{ i + 1 }}</td>
+        <td>{{ classSchedule.className }}</td>
+        <td>{{ classSchedule.professor }}</td>
+        <td>{{ classSchedule.day }}</td>
+        <td>{{ classSchedule.time }}</td>
+        <td>
+          <button type="button" (click)="editClass(i)">Update</button>
+          <button type="button" (click)="removeClass(i)">Remove</button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
 
-    <button type="button" (click)="updateProfile()" class="update-btn">
-      Update Schedule
-    </button>
-</form>
+  <ng-template #noData>
+    <p class="no-data">No class schedules available.</p>
+  </ng-template>
 </div>
