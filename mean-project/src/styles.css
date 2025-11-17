@@ -1,5 +1,4 @@
 
-
 /* Page Header */
 
 :root {
@@ -13,14 +12,14 @@
 
 /* Shared header style */
 
+/* Page Header */
 .page-header {
   text-align: center;
   margin-top: 40px;
   margin-bottom: 20px;
-
   color: #ffffff;
-
   color: var(--text-dark);
+  color: #ffffff;
 
 }
 
@@ -31,6 +30,4 @@
   color: #000000;
 }
 /* Page Header */
-
-  /* color: var(--text-dark); */
-
+/* color: var(--text-dark); */

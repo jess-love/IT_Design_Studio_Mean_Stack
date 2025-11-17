@@ -3,6 +3,7 @@ import { NotFound } from './not-found/not-found';
 import { Home } from './home/home';
 import { ClassSchedule } from './class-schedule/class-schedule';
 import { StudyGroup } from './study-group/study-group';
+import { ReminderComponent } from './reminders/reminder.component';
 
 export const routes: Routes = [
     {
@@ -25,10 +26,15 @@ export const routes: Routes = [
         path: 'study-groups',
         component: StudyGroup
     },
+    {   path: 'reminder',
+        component: ReminderComponent
+    },
     {
         path: '**',
         component: NotFound
     }
 ];
+
+
 
 
