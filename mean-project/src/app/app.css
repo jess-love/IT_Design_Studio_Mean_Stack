@@ -1,0 +1,21 @@
+.launch-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+
+.launch-btn {
+  background-color: #007bff;
+  color: white;
+  padding: 20px 40px;
+  font-size: 24px;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.launch-btn:hover {
+  background-color: #0056b3;
+}

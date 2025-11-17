@@ -1,0 +1,39 @@
+.portal {
+  width: 90%;
+  max-width: 1200px;
+  margin: 30px auto;
+  font-family: var(--font-main);
+}
+
+.container {
+  display: flex;
+  gap: 30px;
+}
+
+.form-section,
+.list-section {
+  flex: 1;
+  background-color: var(--background-light);
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: var(--card-shadow);
+}
+
+form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+button {
+  background-color: var(--primary-color);
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: var(--primary-hover);
+}

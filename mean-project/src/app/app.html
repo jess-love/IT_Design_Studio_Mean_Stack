@@ -1,3 +1,5 @@
+<div *ngIf="!showPortal" class="launch-container">
+  <button (click)="showPortal = true" class="launch-btn">Launch Study Group Portal</button>
+</div>
 
-      <h1>Hello, {{ title() }}</h1>
-      <p>Milestone 1, kick off 🎉</p>
+<app-study-group *ngIf="showPortal"></app-study-group>
