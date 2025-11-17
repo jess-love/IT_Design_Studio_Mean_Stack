@@ -6,8 +6,8 @@ import { CommonModule } from '@angular/common';
   selector: 'app-home',
   standalone: true,
   imports: [CommonModule],
-  template: `<h2>Welcome to Scholar Path!</h2>`,
-  styles: []
+  templateUrl: './home.html',
+  styleUrl: './home.css'
 })
 export class Home {
   

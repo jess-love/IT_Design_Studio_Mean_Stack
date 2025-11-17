@@ -1,0 +1,43 @@
+<div class="portal">
+  <h1>Study Group Portal</h1>
+
+  <div class="container">
+    <!-- Left side: form -->
+    <div class="form-section">
+      <form (ngSubmit)="onSubmit()" #groupForm="ngForm">
+        <input type="hidden" [(ngModel)]="currentGroup.id" name="id">
+
+        <label>Group Name:</label>
+        <input [(ngModel)]="currentGroup.name" name="name" required>
+
+        <label>Course:</label>
+        <input [(ngModel)]="currentGroup.course" name="course" required>
+
+        <label>Location:</label>
+        <input [(ngModel)]="currentGroup.location" name="location" required>
+
+        <label>Study Day:</label>
+        <input [(ngModel)]="currentGroup.day" name="day" required>
+
+        <label>User ID:</label>
+        <input [(ngModel)]="currentGroup.userId" name="userId" required>
+
+        <button type="submit">{{ currentGroup.id ? 'Update' : 'Create' }} Study Group</button>
+        <button type="button" (click)="resetForm()">Clear</button>
+      </form>
+    </div>
+
+    <!-- Right side: list -->
+    <div class="list-section">
+      <h2>Available Study Groups</h2>
+      <ul>
+        <li *ngFor="let group of groups">
+          <strong>{{ group.name }}</strong> — {{ group.course }} — {{ group.location }} — {{ group.day }}
+          <br>
+          <button (click)="editGroup(group)">Edit</button>
+          <button (click)="deleteGroup(group.id)">Delete</button>
+        </li>
+      </ul>
+    </div>
+  </div>
+</div>

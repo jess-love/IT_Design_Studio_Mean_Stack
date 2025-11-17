@@ -1,15 +1,16 @@
 import { Routes } from '@angular/router';
-import { ClassSchedule } from './class-schedule/class-schedule';
 import { NotFound } from './not-found/not-found';
 import { Home } from './home/home';
+import { ClassSchedule } from './class-schedule/class-schedule';
+import { StudyGroup } from './study-group/study-group';
 
 export const routes: Routes = [
     {
-        path: '',  // default route
+        path: '',
         component: Home
     },
     {
-        path: 'home',  // default route
+        path: 'home',
         component: Home
     },
     {
@@ -21,7 +22,13 @@ export const routes: Routes = [
         component: ClassSchedule
     },
     {
+        path: 'study-groups',
+        component: StudyGroup
+    },
+    {
         path: '**',
         component: NotFound
     }
 ];
+
+
