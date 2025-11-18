@@ -1,7 +1,6 @@
 <div class="reminder-page">
-  <h2>Reminders Forum</h2>
+  <h2>Reminders Form</h2>
 
-  <!-- Reminder Form -->
   <form class="reminder-form" [formGroup]="reminderForm"
         (ngSubmit)="editingIndex === null ? addReminder() : updateReminder()">
     
@@ -22,7 +21,6 @@
     <button type="submit">{{ editingIndex === null ? 'Add Reminder' : 'Update Reminder' }}</button>
   </form>
 
-  <!-- Reminders List -->
   <div class="reminder-list">
     <div class="reminder-card" *ngFor="let reminder of reminders; let i = index">
       <div class="reminder-content">
@@ -31,8 +29,8 @@
         <p>{{ reminder.note }}</p>
       </div>
       <div class="reminder-actions">
-        <button (click)="editReminder(i)">Edit</button>
-        <button (click)="deleteReminder(i)">Delete</button>
+        <button type="button" (click)="editReminder(i)">Edit</button>
+        <button type="button" (click)="deleteReminder(i)">Delete</button>
       </div>
     </div>
   </div>

@@ -1,33 +1,64 @@
 const express = require('express');
+const mongoose = require('mongoose');
+const Reminder = require('./Reminder');
+const cors = require('cors');
+
 const app = express();
 app.use(express.json());
+app.use(cors());
 
-let reminders = [];
+mongoose.connect('mongodb://localhost:27017/remindersDB', {
+  useNewUrlParser: true,
+  useUnifiedTopology: true
+})
+.then(() => console.log('MongoDB connected'))
+.catch(err => console.log('DB connection error:', err));
 
-// Create
-app.post('/reminders', (req, res) => {
-  const reminder = req.body;
-  reminders.push(reminder);
-  res.status(201).send(reminder);
+// CRUD ROUTES
+
+// CREATE
+app.post('/reminders', async (req, res) => {
+  try {
+    const reminder = new Reminder(req.body);
+    await reminder.save();
+    res.status(201).send(reminder);
+  } catch (err) {
+    res.status(400).send(err);
+  }
 });
 
-// Read
-app.get('/reminders', (req, res) => {
-  res.send(reminders);
+// READ
+app.get('/reminders', async (req, res) => {
+  try {
+    const reminders = await Reminder.find();
+    res.send(reminders);
+  } catch (err) {
+    res.status(400).send(err);
+  }
 });
 
-// Update
-app.put('/reminders/:id', (req, res) => {
-  const id = req.params.id;
-  reminders[id] = req.body;
-  res.send(reminders[id]);
+// UPDATE
+app.put('/reminders/:id', async (req, res) => {
+  try {
+    const updated = await Reminder.findByIdAndUpdate(
+      req.params.id,
+      req.body,
+      { new: true }
+    );
+    res.send(updated);
+  } catch (err) {
+    res.status(400).send(err);
+  }
 });
 
-// Delete
-app.delete('/reminders/:id', (req, res) => {
-  const id = req.params.id;
-  reminders.splice(id, 1);
-  res.send({ message: 'Reminder deleted' });
+// DELETE
+app.delete('/reminders/:id', async (req, res) => {
+  try {
+    await Reminder.findByIdAndDelete(req.params.id);
+    res.send({ message: 'Reminder deleted' });
+  } catch (err) {
+    res.status(400).send(err);
+  }
 });
 
 app.listen(3000, () => console.log('Server running on port 3000'));

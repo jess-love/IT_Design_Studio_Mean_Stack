@@ -1,8 +1,10 @@
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
+import { HttpClient, HttpClientModule } from '@angular/common/http';
 
 export interface Reminder {
+  _id?: string;
   title: string;
   date: string;
   note: string;
@@ -12,7 +14,7 @@ export interface Reminder {
 @Component({
   selector: 'app-reminder',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, HttpClientModule],
   templateUrl: './reminder.component.html',
   styleUrls: ['./reminder.component.css']
 })
@@ -23,7 +25,9 @@ export class ReminderComponent implements OnInit {
 
   types = ['Assignment', 'Test', 'Study Session', 'Other'];
 
-  constructor(private fb: FormBuilder) {}
+  private apiUrl = 'http://localhost:3000/reminders';
+
+  constructor(private fb: FormBuilder, private http: HttpClient) {}
 
   ngOnInit(): void {
     this.reminderForm = this.fb.group({
@@ -32,12 +36,26 @@ export class ReminderComponent implements OnInit {
       type: ['Assignment', Validators.required],
       note: ['']
     });
+    this.loadReminders();
+  }
+
+  loadReminders() {
+    this.http.get<Reminder[]>(this.apiUrl).subscribe(data => this.reminders = data);
   }
 
   addReminder() {
     if (this.reminderForm.valid) {
-      this.reminders.push(this.reminderForm.value);
-      this.reminderForm.reset({ type: 'Assignment' });
+      this.http.post<Reminder>(this.apiUrl, this.reminderForm.value)
+        .subscribe(() => {
+          this.reminderForm.reset({ type: 'Assignment' });
+          this.loadReminders();
+
+          // Scroll the last reminder into view
+          setTimeout(() => {
+            const lastCard = document.querySelector('.reminder-list .reminder-card:last-child');
+            lastCard?.scrollIntoView({ behavior: 'smooth' });
+          }, 100);
+        });
     }
   }
 
@@ -48,17 +66,27 @@ export class ReminderComponent implements OnInit {
 
   updateReminder() {
     if (this.editingIndex !== null && this.reminderForm.valid) {
-      this.reminders[this.editingIndex] = this.reminderForm.value;
-      this.reminderForm.reset({ type: 'Assignment' });
-      this.editingIndex = null;
+      const reminder = this.reminders[this.editingIndex];
+      this.http.put<Reminder>(`${this.apiUrl}/${reminder._id}`, this.reminderForm.value)
+        .subscribe(() => {
+          this.reminderForm.reset({ type: 'Assignment' });
+          const oldIndex = this.editingIndex;
+          this.editingIndex = null;
+          this.loadReminders();
+
+          // Scroll updated reminder into view
+          setTimeout(() => {
+            const updatedCard = document.querySelectorAll('.reminder-list .reminder-card')[oldIndex!];
+            updatedCard?.scrollIntoView({ behavior: 'smooth' });
+          }, 100);
+        });
     }
   }
 
   deleteReminder(index: number) {
-    this.reminders.splice(index, 1);
-    if (this.editingIndex === index) {
-      this.reminderForm.reset({ type: 'Assignment' });
-      this.editingIndex = null;
-    }
+    const reminder = this.reminders[index];
+    if (!reminder._id) return;
+    this.http.delete(`${this.apiUrl}/${reminder._id}`)
+      .subscribe(() => this.loadReminders());
   }
 }
