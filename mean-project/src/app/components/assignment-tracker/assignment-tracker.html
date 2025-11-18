@@ -1,0 +1,68 @@
+<div class = "container">
+<div class = "page-header">
+  <h1> ScholarPath: Assignment and Deadline Tracker</h1>
+  </div>
+  
+<h2> Please Input Your Class Information Below</h2>
+<h3> Students Please Input the Title of Course for Example: Introduction to History, and the Subject will Auto Fill </h3>
+
+<form [formGroup]="assignmentForm" (ngSubmit)="onSubmit()">
+  <label for="title">Course Name:</label>
+  <input id="title" type="text" formControlName="title" /> <br><br>
+  <div *ngIf="assignmentForm.get('title')?.invalid && assignmentForm.get('title')?.touched">
+    <small class="error">Title is required.</small>
+  </div>
+
+  <label for="description">Description:</label>
+  <textarea id="description" formControlName="description"></textarea> <br><br>
+
+  <label for="dueDate">Due Date:</label>
+  <input id="dueDate" type="date" formControlName="dueDate" /> <br><br>
+  <div *ngIf="assignmentForm.get('dueDate')?.invalid && assignmentForm.get('dueDate')?.touched">
+    <small class="error">Due date is required.</small>
+  </div>
+
+  <label for="subject">Subject:</label>
+  <input id="subject" type="text" formControlName="subject" /> <br><br>
+  <div *ngIf="assignmentForm.get('subject')?.invalid && assignmentForm.get('subject')?.touched">
+    <small class="error">Subject is required.</small>
+  </div>
+
+  <label for="priority">Priority:</label> 
+  <select id="priority" formControlName="priority"> 
+    <option value="High">High</option>
+    <option value="Medium">Medium</option>
+    <option value="Low">Low</option>
+  </select>
+
+  <br><br>
+
+  <button type="submit" [disabled]="assignmentForm.invalid">
+    {{ isEditing ? 'Update Assignment' : 'Add Assignment'}}
+    </button>
+
+<h3 class="center-text">Current Class Assignments</h3>
+
+<div *ngIf="assignments.length === 0">
+  <p>No assignments to display at this time.</p>
+</div>
+
+<div *ngIf="assignments.length > 0">
+  <ul>
+    <li *ngFor="let assignment of assignments; let i = index">
+      <h4>{{ assignment.title }}</h4>
+      <p><strong>Subject:</strong> {{ assignment.subject }}</p>
+      <p><strong>Description:</strong> {{ assignment.description }}</p>
+      <p><strong>Due Date:</strong> {{ assignment.dueDate }}</p>
+      <p><strong>Priority:</strong> {{ assignment.priority }}</p>
+      <p><strong>Status:</strong> {{ assignment.status }}</p>
+
+      <button type="button" (click)="editAssignment(i)">Edit Assignment</button>
+       <button type="button" (click)="removeAssignment(i)"> Remove Assignment</button>
+      <hr />
+    </li>
+  </ul>
+</div>
+
+
+

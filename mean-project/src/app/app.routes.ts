@@ -4,6 +4,7 @@ import { Home } from './home/home';
 import { ClassSchedule } from './class-schedule/class-schedule';
 import { StudyGroup } from './study-group/study-group';
 import { ReminderComponent } from './reminders/reminder.component';
+import { AssignmentTracker } from './components/assignment-tracker/assignment-tracker';
 
 export const routes: Routes = [
     {
@@ -28,6 +29,9 @@ export const routes: Routes = [
     },
     {   path: 'reminder',
         component: ReminderComponent
+    },
+    {   path: 'assignment',
+        component: AssignmentTracker
     },
     {
         path: '**',
