@@ -26,7 +26,7 @@ app.use(bodyParser.urlencoded({ extended: false }))
 app.use(bodyParser.json())
 
 //in the app.get() method below we add a path for the students API 
-//by adding /students, we tell the server that this method will be called every time http://localhost:8000/students is requested. 
+//by adding /class schedules, we tell the server that this method will be called every time http://localhost:8000/class schedule is requested. 
 app.get('/class_schedules', (req, res, next) => {
    //call mongoose method find (MongoDB db.Students.find())
     Class_schedule.find() 
@@ -42,7 +42,7 @@ app.get('/class_schedules', (req, res, next) => {
 
 //find a student based on the id
 app.get('/class_schedules/:id', (req, res, next) => {
-    //call mongoose method findOne (MongoDB db.Students.findOne())
+    //call mongoose method findOne (MongoDB db.class_schedule.findOne())
     Class_schedule.findOne({_id: req.params.id}) 
         //if data is returned, send data as a response 
         .then(data => {
@@ -56,7 +56,7 @@ app.get('/class_schedules/:id', (req, res, next) => {
     });
 });
 
-//serve incoming post requests to /students
+//serve incoming post requests to /class schedule
 app.post('/class_schedules', (req, res, next) => {
     // create a new student variable and save request’s fields 
     const class_schedule = new Class_schedule({
