@@ -2,13 +2,11 @@
   <h1>Study Group Portal</h1>
 
   <div class="container">
-    <!-- Left side: form -->
     <div class="form-section">
       <form (ngSubmit)="onSubmit()" #groupForm="ngForm">
-        <input type="hidden" [(ngModel)]="currentGroup.id" name="id">
 
         <label>Group Name:</label>
-        <input [(ngModel)]="currentGroup.name" name="name" required>
+        <input [(ngModel)]="currentGroup.groupName" name="groupName" required>
 
         <label>Course:</label>
         <input [(ngModel)]="currentGroup.course" name="course" required>
@@ -17,25 +15,30 @@
         <input [(ngModel)]="currentGroup.location" name="location" required>
 
         <label>Study Day:</label>
-        <input [(ngModel)]="currentGroup.day" name="day" required>
+        <input [(ngModel)]="currentGroup.studyDay" name="studyDay" required>
 
         <label>User ID:</label>
         <input [(ngModel)]="currentGroup.userId" name="userId" required>
 
-        <button type="submit">{{ currentGroup.id ? 'Update' : 'Create' }} Study Group</button>
+        <button type="submit">
+          {{ currentGroup._id ? 'Update' : 'Create' }} Study Group
+        </button>
+
         <button type="button" (click)="resetForm()">Clear</button>
       </form>
     </div>
 
-    <!-- Right side: list -->
     <div class="list-section">
       <h2>Available Study Groups</h2>
       <ul>
         <li *ngFor="let group of groups">
-          <strong>{{ group.name }}</strong> — {{ group.course }} — {{ group.location }} — {{ group.day }}
+          <strong>{{ group.groupName }}</strong> — 
+          {{ group.course }} — 
+          {{ group.location }} — 
+          {{ group.studyDay }}
           <br>
           <button (click)="editGroup(group)">Edit</button>
-          <button (click)="deleteGroup(group.id)">Delete</button>
+          <button (click)="deleteGroup(group._id!)">Delete</button>
         </li>
       </ul>
     </div>

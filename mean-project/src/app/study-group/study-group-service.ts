@@ -1,11 +1,13 @@
 import { Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { Observable } from 'rxjs';
 
 export interface StudyGroup {
-  id: number;
-  name: string;
+  _id?: string;        // MongoDB ID
+  groupName: string;
   course: string;
   location: string;
-  day: string;
+  studyDay: string;
   userId: string;
 }
 
@@ -13,31 +15,33 @@ export interface StudyGroup {
   providedIn: 'root'
 })
 export class StudyGroupService {
-  private groups: StudyGroup[] = [
-    { id: 1, name: 'Math Masters', course: 'Calculus I', location: 'Library Room 2', day: 'Monday', userId: 'U101' },
-    { id: 2, name: 'Code Crew', course: 'Intro to Programming', location: 'Online (Zoom)', day: 'Wednesday', userId: 'U202' },
-    { id: 3, name: 'Bio Buddies', course: 'Biology 101', location: 'Science Building 5', day: 'Friday', userId: 'U303' }
-  ];
 
-  private nextId = 4;
+  private apiUrl = 'http://localhost:8000/studygroups';
 
+  constructor(private http: HttpClient) {}
 
-  getGroups(): StudyGroup[] {
-    return this.groups;
+  // CREATE
+  createGroup(group: StudyGroup): Observable<StudyGroup> {
+    return this.http.post<StudyGroup>(this.apiUrl, group);
   }
 
-  addGroup(group: Omit<StudyGroup, 'id'>): void {
-    this.groups.push({ id: this.nextId++, ...group });
+  // READ all
+  getGroups(): Observable<StudyGroup[]> {
+    return this.http.get<StudyGroup[]>(this.apiUrl);
   }
 
-  updateGroup(id: number, updatedGroup: Partial<StudyGroup>): void {
-    const index = this.groups.findIndex(g => g.id === id);
-    if (index !== -1) {
-      this.groups[index] = { ...this.groups[index], ...updatedGroup };
-    }
+  // READ one
+  getGroup(id: string): Observable<StudyGroup> {
+    return this.http.get<StudyGroup>(`${this.apiUrl}/${id}`);
   }
 
-  deleteGroup(id: number): void {
-    this.groups = this.groups.filter(g => g.id !== id);
+  // UPDATE
+  updateGroup(id: string, group: Partial<StudyGroup>): Observable<StudyGroup> {
+    return this.http.put<StudyGroup>(`${this.apiUrl}/${id}`, group);
+  }
+
+  // DELETE
+  deleteGroup(id: string): Observable<any> {
+    return this.http.delete(`${this.apiUrl}/${id}`);
   }
 }
