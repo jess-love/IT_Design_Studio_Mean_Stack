@@ -3,12 +3,15 @@ const express = require('express');
 const app = express();
 const bodyParser  = require('body-parser');
 const mongoose = require('mongoose');
+
 //specify where to find the class schedule schema
 const Class_schedule = require('./models/class_schedule')
 
-
 //specify where to find the reminder schema
 const Reminder = require('./models/Reminder')
+
+//specify where to find the study group schema
+const StudyGroup = require('./models/study_group')
 
 //connect and display the status 
 mongoose.connect('mongodb://localhost:27017/scholarPath')
@@ -164,6 +167,59 @@ app.delete('/reminders/:id', async (req, res) => {
   }
 });
 
+
+
+// CRUD ROUTES Study group
+// =================== STUDY GROUP CRUD ===================
+app.post('/studygroups', async (req, res) => {
+  try {
+    const group = new StudyGroup(req.body);
+    await group.save();
+    res.status(201).send(group);
+  } catch (err) {
+    res.status(400).send(err);
+  }
+});
+
+app.get('/studygroups', async (req, res) => {
+  try {
+    const groups = await StudyGroup.find();
+    res.send(groups);
+  } catch (err) {
+    res.status(400).send(err);
+  }
+});
+
+app.get('/studygroups/:id', async (req, res) => {
+  try {
+    const group = await StudyGroup.findById(req.params.id);
+    if (!group) return res.status(404).send({ message: 'Not found' });
+    res.send(group);
+  } catch (err) {
+    res.status(400).send(err);
+  }
+});
+
+app.put('/studygroups/:id', async (req, res) => {
+  try {
+    const updated = await StudyGroup.findByIdAndUpdate(req.params.id, req.body, { new: true });
+    res.send(updated);
+  } catch (err) {
+    res.status(400).send(err);
+  }
+});
+
+app.delete('/studygroups/:id', async (req, res) => {
+  try {
+    await StudyGroup.findByIdAndDelete(req.params.id);
+    res.send({ message: 'Study group deleted' });
+  } catch (err) {
+    res.status(400).send(err);
+  }
+});
+
+
+// CRUD ROUTES Assignment tracker
 
 //to use this middleware in other parts of the application
 module.exports=app;

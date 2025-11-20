@@ -13,43 +13,72 @@ import { RouterModule } from '@angular/router';
 })
 export class StudyGroup {
   groups: StudyGroupModel[] = [];
-  currentGroup: Partial<StudyGroupModel> = {};
+  currentGroup: StudyGroupModel = {
+    groupName: '',
+    course: '',
+    location: '',
+    studyDay: '',
+    userId: ''
+  };
 
   constructor(private studyGroupService: StudyGroupService) {}
 
   ngOnInit() {
-    this.groups = this.studyGroupService.getGroups();
+    this.loadGroups();
   }
 
+  // LOAD ALL GROUPS FROM DB
+  loadGroups() {
+    this.studyGroupService.getGroups().subscribe(data => {
+      this.groups = data;
+    });
+  }
+
+  // CREATE OR UPDATE
   onSubmit() {
-    if (this.currentGroup.id) {
-      this.studyGroupService.updateGroup(this.currentGroup.id, this.currentGroup);
-      alert('Study Group Updated Successfully!');
+    if (this.currentGroup._id) {
+      // UPDATE
+      this.studyGroupService.updateGroup(this.currentGroup._id, this.currentGroup)
+        .subscribe(() => {
+          alert('Study Group Updated Successfully!');
+          this.loadGroups();
+          this.resetForm();
+        });
     } else {
-      this.studyGroupService.addGroup(this.currentGroup as Omit<StudyGroupModel, 'id'>);
-      alert('Study Group Created Successfully!');
+      // CREATE
+      this.studyGroupService.createGroup(this.currentGroup)
+        .subscribe(() => {
+          alert('Study Group Created Successfully!');
+          this.loadGroups();
+          this.resetForm();
+        });
     }
-    this.refreshList();
-    this.resetForm();
   }
 
+  // EDIT BUTTON
   editGroup(group: StudyGroupModel) {
     this.currentGroup = { ...group };
   }
 
-  deleteGroup(id: number) {
+  // DELETE
+  deleteGroup(id: string) {
     if (confirm('Are you sure you want to delete this study group?')) {
-      this.studyGroupService.deleteGroup(id);
-      alert('Study Group Deleted Successfully!');
-      this.refreshList();
+      this.studyGroupService.deleteGroup(id)
+        .subscribe(() => {
+          alert('Study Group Deleted Successfully!');
+          this.loadGroups();
+        });
     }
   }
 
+  // CLEAR FORM
   resetForm() {
-    this.currentGroup = {};
-  }
-
-  refreshList() {
-    this.groups = this.studyGroupService.getGroups();
+    this.currentGroup = {
+      groupName: '',
+      course: '',
+      location: '',
+      studyDay: '',
+      userId: ''
+    };
   }
 }
