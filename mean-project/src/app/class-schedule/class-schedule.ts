@@ -5,7 +5,7 @@ import { ClassScheduleService } from '../../class_schedule.service';
 import { RouterModule } from '@angular/router';
 
 interface ClassData {
-  _id?: string;      // <- backend ID
+  _id?: string;    
   className: string;
   professor: string;
   day: string;
@@ -76,37 +76,26 @@ export class ClassSchedule {
     time: this.classForm.value.time!.trim()
   };
 
-  // Optimistically update the UI immediately
-  this.classSchedules.push({ ...newSchedule });
-  this.message.set('Class schedule added successfully!');
-  this.classForm.reset();
-  this.editIndex = null;
-  setTimeout(() => this.message.set(''), 3000);
-
-  // Send to backend
   this._myService.addClassSchedules(
-    newSchedule.className,
-    newSchedule.professor,
-    newSchedule.day,
-    newSchedule.time
-  ).subscribe({
-    next: (created) => {
-      // Optional: update _id from backend if returned
-      const index = this.classSchedules.findIndex(c => c.className === newSchedule.className && c.day === newSchedule.day);
-      if (index > -1 && created._id) {
-        this.classSchedules[index]._id = created._id;
-      }
-    },
-    error: (err) => {
-      console.error(err);
-      this.message.set('Failed to save class schedule');
-      setTimeout(() => this.message.set(''), 3000);
-      // Remove the schedule from UI if backend fails
-      this.classSchedules = this.classSchedules.filter(c =>
-        !(c.className === newSchedule.className && c.day === newSchedule.day && c.time === newSchedule.time)
-      );
-    }
-  });
+  newSchedule.className,
+  newSchedule.professor,
+  newSchedule.day,
+  newSchedule.time
+).subscribe({
+  next: (created: ClassData) => {
+    this.classSchedules.push(created); // now created has all data
+    this.message.set('Class schedule added successfully!');
+    this.classForm.reset();
+    this.editIndex = null;
+    setTimeout(() => this.message.set(''), 3000);
+  },
+  error: (err) => {
+    console.error(err);
+    this.message.set('Failed to save class schedule');
+    setTimeout(() => this.message.set(''), 3000);
+  }
+});
+
 }
 
 
@@ -121,9 +110,11 @@ export class ClassSchedule {
     this.editIndex = index;
   }
 
+
   updateClass() {
   if (this.editIndex === null) return;
   const cls = this.classSchedules[this.editIndex];
+  if (!cls._id) return;
 
   const updated: ClassData = {
     className: this.classForm.value.className!.trim(),
@@ -132,44 +123,36 @@ export class ClassSchedule {
     time: this.classForm.value.time!.trim()
   };
 
-  // Optimistically update the UI immediately
-  const oldSchedule = { ...cls }; // keep a copy in case backend fails
-  this.classSchedules[this.editIndex] = { ...updated, _id: cls._id };
-  this.message.set('Class schedule updated');
-  this.editIndex = null;
-  this.classForm.reset();
-  setTimeout(() => this.message.set(''), 3000);
-
-  // Send update to backend
-  if (!cls._id) return; // backend ID is required
   this._myService.updateClass(cls._id, updated).subscribe({
+    next: (res) => {
+      this.getClassSchedules(); // refetch list
+      this.message.set('Class schedule updated');
+      this.classForm.reset();
+      this.editIndex = null;
+      setTimeout(() => this.message.set(''), 3000);
+    },
+    error: (err) => console.error(err)
+  });
+}
+
+
+
+  removeClass(index: number) {
+  const cls = this.classSchedules[index];
+  if (!cls._id) return;
+
+  this._myService.deleteClassSchedule(cls._id).subscribe({
     next: () => {
-      // Success, UI already updated
-      console.log('Class schedule updated in backend');
+      this.classSchedules.splice(index, 1);
+      this.message.set('Class schedule deleted ✅');
+      setTimeout(() => this.message.set(''), 3000);
     },
     error: (err) => {
-      console.error('Failed to update class schedule in backend:', err);
-      // Revert UI to old schedule
-      const index = this.classSchedules.findIndex(c => c._id === cls._id);
-      if (index > -1) this.classSchedules[index] = oldSchedule;
-      this.message.set('Failed to update class schedule');
+      console.error(err);
+      this.message.set('Failed to delete class schedule');
       setTimeout(() => this.message.set(''), 3000);
     }
   });
 }
 
-
-  removeClass(index: number) {
-    const cls = this.classSchedules[index];
-    if (!cls._id) return;
-
-    this._myService.deleteStudent(cls._id).subscribe({
-      next: () => {
-        this.classSchedules.splice(index, 1);
-        this.message.set('Class schedule deleted ✅');
-        setTimeout(() => this.message.set(''), 3000);
-      },
-      error: (err) => console.error(err)
-    });
-  }
 }

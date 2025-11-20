@@ -26,7 +26,7 @@ export class ClassScheduleService {
     return this.http.put(`${this.baseUrl}/${id}`, updated, httpOptions);
   }
 
-  deleteStudent(id: string): Observable<any> {
+  deleteClassSchedule(id: string): Observable<any> {
     return this.http.delete(`${this.baseUrl}/${id}`);
   }
 }
