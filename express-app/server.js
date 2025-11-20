@@ -11,7 +11,6 @@ app.use(express.json());
 app.use(cors());
 
 
-<<<<<<< HEAD
 mongoose.connect('mongodb://localhost:27017/remindersDB')
   .then(async () => {
     console.log('MongoDB connected');
@@ -59,8 +58,8 @@ async function seedStudyGroups() {
 
 
 // =================== REMINDER CRUD ===================
-=======
->>>>>>> b55ba4af4e50bb5e06b687796942efa571c6f0de
+
+b55ba4af4e50bb5e06b687796942efa571c6f0de
 app.post('/reminders', async (req, res) => {
   try {
     const reminder = new Reminder(req.body);
