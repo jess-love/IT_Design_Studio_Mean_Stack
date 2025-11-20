@@ -37,11 +37,13 @@ app.get('/class_schedules/:id', (req, res) => {
 });
 
 app.post('/class_schedules', (req, res) => {
-    const class_schedule = new Class_schedule(req.body);
+    const class_schedule = new Class_schedule(req.body); 
     class_schedule.save()
-        .then(() => res.status(201).json({ message: "Created" }))
+        .then((savedSchedule) => res.status(201).json(savedSchedule)) 
         .catch(err => res.status(500).json(err));
 });
+
+
 
 app.delete("/class_schedules/:id", (req, res) => {
     Class_schedule.deleteOne({ _id: req.params.id })
@@ -153,7 +155,7 @@ app.delete('/studygroups/:id', async (req, res) => {
 
 
 // ================================================
-// ASSIGNMENT TRACKER ROUTES  (FINAL VERSION)
+// ASSIGNMENT TRACKER ROUTES 
 // ================================================
 app.get('/assignments', async (req, res) => {
     try {
@@ -192,8 +194,4 @@ app.delete('/assignments/:id', async (req, res) => {
     }
 });
 
-
-// ================================================
-// EXPORT
-// ================================================
 module.exports = app;
