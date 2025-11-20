@@ -66,37 +66,6 @@ export class ClassSchedule {
     }
   }
 
-  // addClassSchedule() {
-  //   if (!this.classForm.valid) return;
-
-  //   const newSchedule: ClassData = {
-  //     className: this.classForm.value.className!.trim(),
-  //     professor: this.classForm.value.professor!.trim(),
-  //     day: this.classForm.value.day!.trim(),
-  //     time: this.classForm.value.time!.trim()
-  //   };
-
-  //   this._myService.addClassSchedules(
-  //     newSchedule.className,
-  //     newSchedule.professor,
-  //     newSchedule.day,
-  //     newSchedule.time
-  //   ).subscribe({
-  //     next: (created) => {
-  //       // Backend should return the created object with _id
-  //       this.classSchedules.push(created as ClassData);
-  //       this.message.set('Class schedule added successfully! ✅');
-  //       this.classForm.reset();
-  //       this.editIndex = null;
-  //       setTimeout(() => this.message.set(''), 3000);
-  //     },
-  //     error: (err) => {
-  //       console.error(err);
-  //       this.message.set('Failed to add class schedule ❌');
-  //       setTimeout(() => this.message.set(''), 3000);
-  //     }
-  //   });
-  // }
   addClassSchedule() {
   if (!this.classForm.valid) return;
 
@@ -152,29 +121,6 @@ export class ClassSchedule {
     this.editIndex = index;
   }
 
-  // updateClass() {
-  //   if (this.editIndex === null) return;
-  //   const cls = this.classSchedules[this.editIndex];
-  //   if (!cls._id) return; // must have backend ID
-
-  //   const updated: ClassData = {
-  //     className: this.classForm.value.className!.trim(),
-  //     professor: this.classForm.value.professor!.trim(),
-  //     day: this.classForm.value.day!.trim(),
-  //     time: this.classForm.value.time!.trim()
-  //   };
-
-  //   this._myService.updateClass(cls._id, updated).subscribe({
-  //     next: () => {
-  //       this.classSchedules[this.editIndex!] = { ...updated, _id: cls._id };
-  //       this.message.set('Class schedule updated ✅');
-  //       this.editIndex = null;
-  //       this.classForm.reset();
-  //       setTimeout(() => this.message.set(''), 3000);
-  //     },
-  //     error: (err) => console.error(err)
-  //   });
-  // }
   updateClass() {
   if (this.editIndex === null) return;
   const cls = this.classSchedules[this.editIndex];
