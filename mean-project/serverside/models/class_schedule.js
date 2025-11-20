@@ -9,8 +9,5 @@ const ClassScheduleSchema = new mongoose.Schema({
     time:       { type: String, required: true}
 });
 
-//use the blueprint to create the model 
-//Parameters: (model_name, schema_to_use, collection_name)
-//module.exports is used to allow external access to the model  
+
 module.exports = mongoose.model('ClassSchedule', ClassScheduleSchema,'ClassSchedules');
-//note capital S in the collection name

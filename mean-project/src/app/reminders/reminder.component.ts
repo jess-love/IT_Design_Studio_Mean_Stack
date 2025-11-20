@@ -25,7 +25,7 @@ export class ReminderComponent implements OnInit {
 
   types = ['Assignment', 'Test', 'Study Session', 'Other'];
 
-  private apiUrl = 'http://localhost:3000/reminders';
+  private apiUrl = 'http://localhost:8000/reminders';
 
   constructor(private fb: FormBuilder, private http: HttpClient) {}
 
@@ -61,7 +61,9 @@ export class ReminderComponent implements OnInit {
 
   editReminder(index: number) {
     this.editingIndex = index;
-    this.reminderForm.setValue(this.reminders[index]);
+    // this.reminderForm.setValue(this.reminders[index]);
+    this.reminderForm.patchValue(this.reminders[index]);
+
   }
 
   updateReminder() {
