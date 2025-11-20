@@ -6,6 +6,8 @@ import { NavigationMenu } from './navigation-menu/navigation-menu';
 import { ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatMenuModule } from '@angular/material/menu';
+// import { AssignmentTracker } from './components/assignment-tracker/assignment-tracker';
+
 
 @Component({
   selector: 'app-root',
@@ -16,9 +18,10 @@ import { MatMenuModule } from '@angular/material/menu';
     HttpClientModule,
     NavigationMenu,
     ReactiveFormsModule,
-    MatButtonModule, 
-    MatMenuModule       
-  ],
+    MatButtonModule,
+    MatMenuModule,
+    ReactiveFormsModule
+],
   templateUrl: './app.html',
   styleUrls: ['./app.css']
 })
