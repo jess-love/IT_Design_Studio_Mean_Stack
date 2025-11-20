@@ -13,6 +13,6 @@ bootstrapApplication(App, {
     ...appConfig.providers,
     provideHttpClient(),
     importProvidersFrom(ReactiveFormsModule),
-    provideRouter(routes)   // ⭐ THE MISSING PIECE ⭐
+    provideRouter(routes)   // ⭐ THE MISSING PIECE
   ]
 }).catch(err => console.error(err));
