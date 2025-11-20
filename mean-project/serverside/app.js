@@ -3,8 +3,13 @@ const express = require('express');
 const app = express();
 const bodyParser  = require('body-parser');
 const mongoose = require('mongoose');
-//specify where to find the schema
+//specify where to find the class schedule schema
 const Class_schedule = require('./models/class_schedule')
+
+
+//specify where to find the reminder schema
+const Reminder = require('./models/Reminder')
+
 //connect and display the status 
 mongoose.connect('mongodb://localhost:27017/scholarPath')
     .then(() => { console.log("connected"); })
@@ -25,8 +30,8 @@ app.use(bodyParser.urlencoded({ extended: false }))
 //parse application/json
 app.use(bodyParser.json())
 
-//in the app.get() method below we add a path for the students API 
-//by adding /class schedules, we tell the server that this method will be called every time http://localhost:8000/class schedule is requested. 
+
+// CRUD ROUTES Class schedule
 app.get('/class_schedules', (req, res, next) => {
    //call mongoose method find (MongoDB db.Students.find())
     Class_schedule.find() 
@@ -40,7 +45,7 @@ app.get('/class_schedules', (req, res, next) => {
 
 });
 
-//find a student based on the id
+//find a class based on the id
 app.get('/class_schedules/:id', (req, res, next) => {
     //call mongoose method findOne (MongoDB db.class_schedule.findOne())
     Class_schedule.findOne({_id: req.params.id}) 
@@ -81,8 +86,7 @@ app.delete("/class_schedules/:id", (req, res, next) => {
     });
 });
 
-
-//serve incoming put requests to /students 
+//serve incoming put requests to /class_schedules 
 app.put('/class_schedules/:id', (req, res, next) => { 
     console.log("id: " + req.params.id) 
     // check that the parameter id is valid 
@@ -112,6 +116,54 @@ app.put('/class_schedules/:id', (req, res, next) => {
         console.log("please provide correct id"); 
     } 
 });
+
+
+// CRUD ROUTES Reminder
+// CREATE
+app.post('/reminders', async (req, res) => {
+  try {
+    const reminder = new Reminder(req.body);
+    await reminder.save();
+    res.status(201).send(reminder);
+  } catch (err) {
+    res.status(400).send(err);
+  }
+});
+
+// READ
+app.get('/reminders', async (req, res) => {
+  try {
+    const reminders = await Reminder.find();
+    res.send(reminders);
+  } catch (err) {
+    res.status(400).send(err);
+  }
+});
+
+// UPDATE
+app.put('/reminders/:id', async (req, res) => {
+  try {
+    const updated = await Reminder.findByIdAndUpdate(
+      req.params.id,
+      req.body,
+      { new: true }
+    );
+    res.send(updated);
+  } catch (err) {
+    res.status(400).send(err);
+  }
+});
+
+// DELETE
+app.delete('/reminders/:id', async (req, res) => {
+  try {
+    await Reminder.findByIdAndDelete(req.params.id);
+    res.send({ message: 'Reminder deleted' });
+  } catch (err) {
+    res.status(400).send(err);
+  }
+});
+
 
 //to use this middleware in other parts of the application
 module.exports=app;

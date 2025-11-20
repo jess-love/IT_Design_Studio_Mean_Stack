@@ -14,8 +14,7 @@ mongoose.connect('mongodb://localhost:27017/remindersDB', {
 .then(() => console.log('MongoDB connected'))
 .catch(err => console.log('DB connection error:', err));
 
-// CRUD ROUTES
-
+// CRUD ROUTES Reminder
 // CREATE
 app.post('/reminders', async (req, res) => {
   try {
