@@ -16,7 +16,7 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
 // MongoDB Connection
-mongoose.connect('mongodb+srv://marie_01:ITDesignStudio@cluster0.4wsjtrm.mongodb.net/?appName=Cluster0')
+mongoose.connect('mongodb+srv://user:password@cluster0.4wsjtrm.mongodb.net/?appName=Cluster0')
     .then(() => { console.log("connected"); })
     .catch(() => { console.log("error connecting"); });
 
