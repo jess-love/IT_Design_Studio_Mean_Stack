@@ -12,12 +12,15 @@ import { RouterModule } from '@angular/router';
   styleUrls: ['./study-group.css']
 })
 export class StudyGroup {
+
   groups: StudyGroupModel[] = [];
+
   currentGroup: StudyGroupModel = {
     groupName: '',
     course: '',
     location: '',
-    studyDay: '',
+    studyDate: '',
+    studyTime: '',
     userId: ''
   };
 
@@ -27,17 +30,26 @@ export class StudyGroup {
     this.loadGroups();
   }
 
-  // LOAD ALL GROUPS FROM DB
+  connectGoogle() {
+    window.location.href = 'http://localhost:8000/auth/google';
+  }
+
   loadGroups() {
     this.studyGroupService.getGroups().subscribe(data => {
       this.groups = data;
     });
   }
 
-  // CREATE OR UPDATE
+  convertTo12Hour(time: string): string {
+    if (!time) return "";
+    let [h, m] = time.split(':').map(Number);
+    const ampm = h >= 12 ? 'PM' : 'AM';
+    h = h % 12 || 12;
+    return `${h}:${m.toString().padStart(2, '0')} ${ampm}`;
+  }
+
   onSubmit() {
     if (this.currentGroup._id) {
-      // UPDATE
       this.studyGroupService.updateGroup(this.currentGroup._id, this.currentGroup)
         .subscribe(() => {
           alert('Study Group Updated Successfully!');
@@ -45,7 +57,6 @@ export class StudyGroup {
           this.resetForm();
         });
     } else {
-      // CREATE
       this.studyGroupService.createGroup(this.currentGroup)
         .subscribe(() => {
           alert('Study Group Created Successfully!');
@@ -55,29 +66,26 @@ export class StudyGroup {
     }
   }
 
-  // EDIT BUTTON
   editGroup(group: StudyGroupModel) {
     this.currentGroup = { ...group };
   }
 
-  // DELETE
   deleteGroup(id: string) {
     if (confirm('Are you sure you want to delete this study group?')) {
-      this.studyGroupService.deleteGroup(id)
-        .subscribe(() => {
-          alert('Study Group Deleted Successfully!');
-          this.loadGroups();
-        });
+      this.studyGroupService.deleteGroup(id).subscribe(() => {
+        alert('Study Group Deleted Successfully!');
+        this.loadGroups();
+      });
     }
   }
 
-  // CLEAR FORM
   resetForm() {
     this.currentGroup = {
       groupName: '',
       course: '',
       location: '',
-      studyDay: '',
+      studyDate: '',
+      studyTime: '',
       userId: ''
     };
   }

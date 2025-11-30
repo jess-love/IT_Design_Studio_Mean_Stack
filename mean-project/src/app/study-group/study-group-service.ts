@@ -7,7 +7,8 @@ export interface StudyGroup {
   groupName: string;
   course: string;
   location: string;
-  studyDay: string;
+  studyDate: string;
+  studyTime: string;
   userId: string;
 }
 
@@ -20,27 +21,27 @@ export class StudyGroupService {
 
   constructor(private http: HttpClient) {}
 
-  // CREATE
+
   createGroup(group: StudyGroup): Observable<StudyGroup> {
     return this.http.post<StudyGroup>(this.apiUrl, group);
   }
 
-  // READ all
+
   getGroups(): Observable<StudyGroup[]> {
     return this.http.get<StudyGroup[]>(this.apiUrl);
   }
 
-  // READ one
+ 
   getGroup(id: string): Observable<StudyGroup> {
     return this.http.get<StudyGroup>(`${this.apiUrl}/${id}`);
   }
 
-  // UPDATE
+
   updateGroup(id: string, group: Partial<StudyGroup>): Observable<StudyGroup> {
     return this.http.put<StudyGroup>(`${this.apiUrl}/${id}`, group);
   }
 
-  // DELETE
+
   deleteGroup(id: string): Observable<any> {
     return this.http.delete(`${this.apiUrl}/${id}`);
   }

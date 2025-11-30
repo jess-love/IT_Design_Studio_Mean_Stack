@@ -1,20 +1,20 @@
 .portal {
-  width: 90%;
-  max-width: 1200px;
+  width: 90;              
+  max-width: 1300px;       
   margin: 30px auto;
   font-family: var(--font-main);
 }
 
 .container {
   display: flex;
-  gap: 30px;
+  gap: 40px;              
 }
 
 .form-section,
 .list-section {
   flex: 1;
   background-color: var(--background-light);
-  padding: 20px;
+  padding: 25px;
   border-radius: 12px;
   box-shadow: var(--card-shadow);
 }
@@ -22,18 +22,91 @@
 form {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 14px;
 }
+
+label {
+  font-weight: bold;
+  color: var(--text-dark);
+}
+
+input,
+select {
+  padding: 12px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  background: white;
+  font-size: 14px;
+}
+
 
 button {
-  background-color: var(--primary-color);
-  color: white;
   border: none;
-  padding: 10px 20px;
+  padding: 10px 18px;
   border-radius: 8px;
   cursor: pointer;
+  font-size: 14px;
 }
 
-button:hover {
-  background-color: var(--primary-hover);
+.btn,
+.edit-btn {
+  background-color: var(--primary-color);  
+  color: white;
+}
+
+.btn:hover,
+.edit-btn:hover {
+  background-color: var(--primary-color);
+}
+
+
+.secondary,
+.clear-btn,
+.delete-btn {
+  background-color: #e0e0e0;
+  color: black;
+}
+
+.secondary:hover,
+.clear-btn:hover,
+.delete-btn:hover {
+  background-color: #e0e0e0;
+  color: black;
+}
+
+
+ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.group-item {
+  background-color: var(--background-light);
+  padding: 18px;
+  border-radius: 10px;
+  margin-bottom: 18px;
+  box-shadow: var(--card-shadow);
+}
+
+
+.group-header {
+  font-size: 18px;
+  font-weight: bold;
+  color: var(--text-dark);
+  margin-bottom: 10px;
+}
+
+
+.group-details p {
+  margin: 4px 0;
+  font-size: 14px;
+  color: var(--text-medium);
+}
+
+
+.group-actions {
+  margin-top: 12px;
+  display: flex;
+  gap: 10px;
 }
