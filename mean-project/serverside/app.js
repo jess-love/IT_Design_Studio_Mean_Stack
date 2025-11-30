@@ -16,7 +16,7 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
 // MongoDB Connection
-mongoose.connect('mongodb://localhost:27017/scholarPath')
+mongoose.connect('mongodb+srv://marie_01:ITDesignStudio@cluster0.4wsjtrm.mongodb.net/?appName=Cluster0')
     .then(() => { console.log("connected"); })
     .catch(() => { console.log("error connecting"); });
 
