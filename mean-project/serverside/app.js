@@ -131,20 +131,18 @@ app.post('/class_schedules', async (req, res) => {
 
     const { className, professor, day, time } = req.body;
 
-    // --- Validate required fields ---
     if (!className || !time || !day) {
       return res.status(400).json({ message: "Missing required field: className, day, or time" });
     }
 
-    // --- Optional: validate time format HH:mm ---
     if (!/^\d{1,2}:\d{2}$/.test(time)) {
       return res.status(400).json({ message: "Time must be in HH:mm format" });
     }
 
     const cls = new Class_schedule({ className, professor, day, time });
-    await cls.save(); // Save to MongoDB first
+    await cls.save(); 
 
-    // --- Google Calendar integration ---
+   
     const token = tokenStore.getToken();
     if (token) {
       try {
@@ -154,7 +152,7 @@ app.post('/class_schedules', async (req, res) => {
         await cls.save();
       } catch (gcalErr) {
         console.error("Google Calendar error:", gcalErr);
-        // You can choose to continue saving in MongoDB even if Google fails
+        
         return res.status(500).json({ message: "Saved in DB but failed to create Google Calendar event", error: gcalErr });
       }
     }
@@ -172,17 +170,14 @@ app.put('/class_schedules/:id', async (req, res) => {
   try {
     const { className, professor, day, time } = req.body;
 
-    // --- Validate required fields ---
     if (!className || !time || !day) {
       return res.status(400).json({ message: "Missing required field: className, day, or time" });
     }
 
-    // Optional: validate time format
     if (!/^\d{1,2}:\d{2}$/.test(time)) {
       return res.status(400).json({ message: "Time must be in HH:mm format" });
     }
 
-    // Update class schedule in MongoDB
     const cls = await Class_schedule.findByIdAndUpdate(
       req.params.id,
       { className, professor, day, time },
@@ -191,7 +186,6 @@ app.put('/class_schedules/:id', async (req, res) => {
 
     if (!cls) return res.status(404).json({ message: "Class schedule not found" });
 
-    // --- Google Calendar update ---
     const token = tokenStore.getToken();
     if (token && cls.googleEventId) {
       try {
@@ -210,7 +204,6 @@ app.put('/class_schedules/:id', async (req, res) => {
     res.status(500).json({ message: "Server error while updating class schedule", error: err });
   }
 });
-
 
 app.delete('/class_schedules/:id', async (req, res) => {
   try {
