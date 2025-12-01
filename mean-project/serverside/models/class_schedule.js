@@ -4,9 +4,11 @@ const mongoose = require('mongoose');
 
 const ClassScheduleSchema = new mongoose.Schema({
     className:  { type: String, required: true},
-    professor:  { type: String, required: true},
-    day:        { type: String, required: false},
-    time:       { type: String, required: true}
+    professor:  { type: String, required: false},
+    day:        { type: String, required: true},
+    time:       { type: String, required: true},
+    googleEventId: { type: String, default: null }
+
 });
 
 
