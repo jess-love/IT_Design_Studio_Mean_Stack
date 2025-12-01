@@ -1,6 +1,8 @@
 <div class="page-header">
   <h2>{{ subtitle() }}</h2> 
   <h3>Please fill out your class information</h3>
+  <h3>Click the button below to save your schedule in Google Calendar before filling the form.</h3>
+  <button class="btn" (click)="connectGoogle()">Connect to Google Calendar</button>
 </div>
 
 <div class="form-container">
@@ -61,7 +63,9 @@
         <td>{{ classSchedule.className }}</td>
         <td>{{ classSchedule.professor }}</td>
         <td>{{ classSchedule.day }}</td>
-        <td>{{ classSchedule.time }}</td>
+        <!-- <td>{{ classSchedule.time }}</td> -->
+        <td>{{ convertTo12Hour(classSchedule.time) }}</td>
+
         <td>
           <button type="button" (click)="editClass(i)">Update</button>
           <button type="button" (click)="removeClass(i)">Remove</button>

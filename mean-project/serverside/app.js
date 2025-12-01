@@ -20,20 +20,21 @@ app.use(cors());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
+
+
+// MongoDB Connection
+mongoose.connect('mongodb+srv://user:password@cluster0.4wsjtrm.mongodb.net/?appName=Cluster0')
+    .then(() => { console.log("connected"); })
+    .catch(() => { console.log("error connecting"); });
+
 // Google OAuth Routes
 app.use('/', calendarRoutes);
 
-// MONGO CONNECTION
-
-mongoose
-  .connect("mongodb+srv://emanie_04:ITDesignStudio@cluster0.4wsjtrm.mongodb.net/scholarPath?retryWrites=true&w=majority&appName=Cluster0")
-  .then(() => console.log("connected"))
-  .catch(err => console.error("error connecting", err));
 
 
 
 // ===================================================
-// GOOGLE EVENT BUILDER
+// GOOGLE EVENT BUILDER FOR STUDY GROUP
 // ===================================================
 function buildStudyGroupEvent(group) {
 
@@ -64,7 +65,53 @@ function buildStudyGroupEvent(group) {
 
 
 // ===================================================
-// CLASS SCHEDULE ROUTES
+// GOOGLE EVENT BUILDER FOR CLASS SCHEDULE
+// ===================================================
+function buildClassScheduleGroupEvent(cls) {
+  const daysOfWeek = {
+    "Sunday": "SU",
+    "Monday": "MO",
+    "Tuesday": "TU",
+    "Wednesday": "WE",
+    "Thursday": "TH",
+    "Friday": "FR",
+    "Saturday": "SA"
+  };
+
+  const [hour, minute] = cls.time.split(':').map(Number);
+
+  const start = new Date();
+  const targetDay = daysOfWeek[cls.day];
+  const today = start.getDay();
+  const targetDayNum = Object.keys(daysOfWeek).indexOf(cls.day);
+
+  let diff = targetDayNum - today;
+  if (diff < 0) diff += 7;
+  start.setDate(start.getDate() + diff);
+  start.setHours(hour, minute, 0, 0);
+
+  const end = new Date(start);
+  end.setHours(end.getHours() + 1); //   1 hour by default
+
+  return {
+    summary: cls.className,
+    description: `Professor: ${cls.professor}`,
+    start: {
+      dateTime: start.toISOString(),
+      timeZone: "America/New_York"
+    },
+    end: {
+      dateTime: end.toISOString(),
+      timeZone: "America/New_York"
+    },
+    recurrence: [`RRULE:FREQ=WEEKLY;BYDAY=${targetDay}`] // repeats the class schedule every week
+  };
+}
+
+
+
+// ===================================================
+// CLASS SCHEDULE ROUTES + GOOGLE CALENDAR
 // ===================================================
 app.get('/class_schedules', (req, res) => {
   Class_schedule.find()
@@ -78,24 +125,120 @@ app.get('/class_schedules/:id', (req, res) => {
     .catch(err => res.status(500).json(err));
 });
 
-app.post('/class_schedules', (req, res) => {
-  const class_schedule = new Class_schedule(req.body);
-  class_schedule.save()
-    .then(saved => res.status(201).json(saved))
-    .catch(err => res.status(500).json(err));
+app.post('/class_schedules', async (req, res) => {
+  try {
+    console.log("Incoming class schedule:", req.body);
+
+    const { className, professor, day, time } = req.body;
+
+    // --- Validate required fields ---
+    if (!className || !time || !day) {
+      return res.status(400).json({ message: "Missing required field: className, day, or time" });
+    }
+
+    // --- Optional: validate time format HH:mm ---
+    if (!/^\d{1,2}:\d{2}$/.test(time)) {
+      return res.status(400).json({ message: "Time must be in HH:mm format" });
+    }
+
+    const cls = new Class_schedule({ className, professor, day, time });
+    await cls.save(); // Save to MongoDB first
+
+    // --- Google Calendar integration ---
+    const token = tokenStore.getToken();
+    if (token) {
+      try {
+        const eventDetails = buildClassScheduleGroupEvent(cls);
+        const eventId = await calendarService.createEvent(token, eventDetails);
+        cls.googleEventId = eventId;
+        await cls.save();
+      } catch (gcalErr) {
+        console.error("Google Calendar error:", gcalErr);
+        // You can choose to continue saving in MongoDB even if Google fails
+        return res.status(500).json({ message: "Saved in DB but failed to create Google Calendar event", error: gcalErr });
+      }
+    }
+
+    res.status(201).json(cls);
+
+  } catch (err) {
+    console.error("Server error:", err);
+    res.status(500).json({ message: "Server error while saving class schedule", error: err });
+  }
 });
 
-app.put('/class_schedules/:id', (req, res) => {
-  Class_schedule.findOneAndUpdate({ _id: req.params.id }, req.body, { new: true })
-    .then(updated => res.status(200).json(updated))
-    .catch(err => res.status(500).json(err));
+
+app.put('/class_schedules/:id', async (req, res) => {
+  try {
+    const { className, professor, day, time } = req.body;
+
+    // --- Validate required fields ---
+    if (!className || !time || !day) {
+      return res.status(400).json({ message: "Missing required field: className, day, or time" });
+    }
+
+    // Optional: validate time format
+    if (!/^\d{1,2}:\d{2}$/.test(time)) {
+      return res.status(400).json({ message: "Time must be in HH:mm format" });
+    }
+
+    // Update class schedule in MongoDB
+    const cls = await Class_schedule.findByIdAndUpdate(
+      req.params.id,
+      { className, professor, day, time },
+      { new: true }
+    );
+
+    if (!cls) return res.status(404).json({ message: "Class schedule not found" });
+
+    // --- Google Calendar update ---
+    const token = tokenStore.getToken();
+    if (token && cls.googleEventId) {
+      try {
+        const eventDetails = buildClassScheduleGroupEvent(cls);
+        await calendarService.updateEvent(token, cls.googleEventId, eventDetails);
+      } catch (gcalErr) {
+        console.error("Google Calendar update error:", gcalErr);
+        return res.status(500).json({ message: "Updated in DB but failed to update Google Calendar event", error: gcalErr });
+      }
+    }
+
+    res.status(200).json(cls);
+
+  } catch (err) {
+    console.error("Server error:", err);
+    res.status(500).json({ message: "Server error while updating class schedule", error: err });
+  }
 });
 
-app.delete('/class_schedules/:id', (req, res) => {
-  Class_schedule.deleteOne({ _id: req.params.id })
-    .then(() => res.status(200).json("Deleted"))
-    .catch(err => res.status(500).json(err));
+
+app.delete('/class_schedules/:id', async (req, res) => {
+  try {
+    const cls = await Class_schedule.findById(req.params.id);
+
+    if (!cls) return res.status(404).json({ message: "Class schedule not found" });
+
+    const token = tokenStore.getToken();
+    if (token && cls.googleEventId) {
+      try {
+        await calendarService.deleteEvent(token, cls.googleEventId);
+      } catch (gcalErr) {
+        console.error("Google Calendar delete error:", gcalErr);
+        return res.status(500).json({ message: "Deleted in DB but failed to delete Google Calendar event", error: gcalErr });
+      }
+    }
+
+    await Class_schedule.findByIdAndDelete(req.params.id);
+
+    res.status(200).json({ message: "Class schedule deleted successfully" });
+
+  } catch (err) {
+    console.error("Server error:", err);
+    res.status(500).json({ message: "Server error while deleting class schedule", error: err });
+  }
 });
+
+
 
 
 // ===================================================
@@ -253,11 +396,5 @@ app.delete('/assignments/:id', async (req, res) => {
   }
 });
 
-
-// START SERVER
-const PORT = 8000;
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-});
 
 module.exports = app;

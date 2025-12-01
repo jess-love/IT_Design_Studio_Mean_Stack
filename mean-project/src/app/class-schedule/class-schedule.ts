@@ -51,6 +51,10 @@ export class ClassSchedule {
     this.getClassSchedules();
   }
 
+    connectGoogle() {
+    window.location.href = 'http://localhost:8000/auth/google';
+  }
+
   getClassSchedules() {
     this._myService.getClassSchedules().subscribe({
       next: (data) => { this.classSchedules = data as ClassData[]; },
@@ -66,6 +70,29 @@ export class ClassSchedule {
     }
   }
 
+  //to convert the time and send it to the server so google calendar can understand the format
+  convertTo24Hour(time12h: string): string {
+  let [time, modifier] = time12h.split(' ');
+  let [hours, minutes] = time.split(':').map(Number);
+
+  if (modifier === 'PM' && hours !== 12) hours += 12;
+  if (modifier === 'AM' && hours === 12) hours = 0;
+
+  return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
+}
+
+
+  //to convert the time inside of the angular app
+convertTo12Hour(time: string): string {
+  if (!time) return "";
+  let [h, m] = time.split(':').map(Number);
+  const ampm = h >= 12 ? 'PM' : 'AM';
+  h = h % 12 || 12;
+  return `${h}:${m.toString().padStart(2, '0')} ${ampm}`;
+}
+
+
+
   addClassSchedule() {
   if (!this.classForm.valid) return;
 
@@ -76,11 +103,13 @@ export class ClassSchedule {
     time: this.classForm.value.time!.trim()
   };
 
+  
+const time24h = this.convertTo24Hour(this.classForm.value.time!);
   this._myService.addClassSchedules(
   newSchedule.className,
   newSchedule.professor,
   newSchedule.day,
-  newSchedule.time
+  time24h
 ).subscribe({
   next: (created: ClassData) => {
     this.classSchedules.push(created); // now created has all data
@@ -120,7 +149,7 @@ export class ClassSchedule {
     className: this.classForm.value.className!.trim(),
     professor: this.classForm.value.professor!.trim(),
     day: this.classForm.value.day!.trim(),
-    time: this.classForm.value.time!.trim()
+    time: this.convertTo24Hour(this.classForm.value.time!) 
   };
 
   this._myService.updateClass(cls._id, updated).subscribe({
