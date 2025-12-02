@@ -1,37 +1,38 @@
 <div class="reminder-page">
   <h2>Reminders Form</h2>
 
-  <form class="reminder-form" [formGroup]="reminderForm"
-        (ngSubmit)="editingIndex === null ? addReminder() : updateReminder()">
-    
+  <form class="reminder-form" [formGroup]="reminderForm" (ngSubmit)="submitReminder()">
     <label>Title:</label>
     <input type="text" formControlName="title" placeholder="Enter title" required>
 
     <label>Date:</label>
     <input type="date" formControlName="date" required>
 
+    <label>Time:</label>
+    <input type="time" formControlName="time" required>
+
     <label>Type:</label>
     <select formControlName="type">
       <option *ngFor="let t of types" [value]="t">{{ t }}</option>
     </select>
 
-    <label>Note:</label>
-    <textarea formControlName="note" placeholder="Enter details"></textarea>
+    <label>Description:</label>
+    <textarea formControlName="description" placeholder="Enter details"></textarea>
 
-    <button type="submit">{{ editingIndex === null ? 'Add Reminder' : 'Update Reminder' }}</button>
+    <button type="submit">{{ editingId ? 'Update Reminder' : 'Add Reminder' }}</button>
   </form>
 
   <div class="reminder-list">
-    <div class="reminder-card" *ngFor="let reminder of reminders; let i = index">
+    <div class="reminder-card" *ngFor="let reminder of reminders">
       <div class="reminder-content">
         <h3>{{ reminder.title }}</h3>
-        <p class="reminder-date">{{ reminder.date }} | {{ reminder.type }}</p>
-        <p>{{ reminder.note }}</p>
+        <p class="reminder-date">{{ reminder.date }} | {{ reminder.time }} | {{ reminder.type }}</p>
+        <p>{{ reminder.description }}</p>
       </div>
       <div class="reminder-actions">
-        <button type="button" (click)="editReminder(i)">Edit</button>
-        <button type="button" (click)="deleteReminder(i)">Delete</button>
+        <button type="button" (click)="editReminder(reminder)">Edit</button>
+        <button type="button" (click)="deleteReminder(reminder)">Delete</button>
       </div>
     </div>
-  </div> 
-</div> 
+  </div>
+</div>

@@ -1,94 +1,94 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
-import { HttpClient, HttpClientModule } from '@angular/common/http';
+import { ReminderService } from './reminder.service';
 
 export interface Reminder {
-  _id?: string;
+  _id?: string; //MongoDBID
   title: string;
   date: string;
-  note: string;
+  time: string;
   type: 'Assignment' | 'Test' | 'Study Session' | 'Other';
+  description: string;
 }
 
 @Component({
   selector: 'app-reminder',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, HttpClientModule],
+  imports: [CommonModule, ReactiveFormsModule],
   templateUrl: './reminder.component.html',
   styleUrls: ['./reminder.component.css']
 })
 export class ReminderComponent implements OnInit {
   reminderForm!: FormGroup;
   reminders: Reminder[] = [];
-  editingIndex: number | null = null;
+  editingId: string | null = null;
 
   types = ['Assignment', 'Test', 'Study Session', 'Other'];
 
-  private apiUrl = 'http://localhost:8000/reminders';
-
-  constructor(private fb: FormBuilder, private http: HttpClient) {}
+  constructor(private fb: FormBuilder, private reminderService: ReminderService) {}
 
   ngOnInit(): void {
     this.reminderForm = this.fb.group({
       title: ['', Validators.required],
       date: ['', Validators.required],
+      time: ['', Validators.required],
       type: ['Assignment', Validators.required],
-      note: ['']
+      description: ['']
     });
+
     this.loadReminders();
   }
 
   loadReminders() {
-    this.http.get<Reminder[]>(this.apiUrl).subscribe(data => this.reminders = data);
+    this.reminderService.getReminders().subscribe({
+      next: (data) => this.reminders = data,
+      error: (err) => console.error(err)
+    });
   }
 
-  addReminder() {
-    if (this.reminderForm.valid) {
-      this.http.post<Reminder>(this.apiUrl, this.reminderForm.value)
-        .subscribe(() => {
-          this.reminderForm.reset({ type: 'Assignment' });
-          this.loadReminders();
+  submitReminder() {
+    if (this.reminderForm.invalid) return;
 
-          // Scroll the last reminder into view
-          setTimeout(() => {
-            const lastCard = document.querySelector('.reminder-list .reminder-card:last-child');
-            lastCard?.scrollIntoView({ behavior: 'smooth' });
-          }, 100);
-        });
+    const reminder: Reminder = this.reminderForm.value;
+
+    if (this.editingId) {
+      this.reminderService.updateReminder(this.editingId, reminder).subscribe({
+        next: (updated) => {
+          const index = this.reminders.findIndex(r => r._id === this.editingId);
+          if (index > -1) this.reminders[index] = updated;
+          this.reminderForm.reset({ type: 'Assignment' });
+          this.editingId = null;
+        },
+        error: (err) => console.error(err)
+      });
+    } else {
+      this.reminderService.addReminder(reminder).subscribe({
+        next: (newReminder) => {
+          this.reminders.push(newReminder);
+          this.reminderForm.reset({ type: 'Assignment' });
+        },
+        error: (err) => console.error(err)
+      });
     }
   }
 
-  editReminder(index: number) {
-    this.editingIndex = index;
-    // this.reminderForm.setValue(this.reminders[index]);
-    this.reminderForm.patchValue(this.reminders[index]);
-
+  editReminder(reminder: Reminder) {
+    this.editingId = reminder._id || null;
+    this.reminderForm.setValue({
+      title: reminder.title,
+      date: reminder.date,
+      time: reminder.time,
+      type: reminder.type,
+      description: reminder.description || ''
+    });
   }
 
-  updateReminder() {
-    if (this.editingIndex !== null && this.reminderForm.valid) {
-      const reminder = this.reminders[this.editingIndex];
-      this.http.put<Reminder>(`${this.apiUrl}/${reminder._id}`, this.reminderForm.value)
-        .subscribe(() => {
-          this.reminderForm.reset({ type: 'Assignment' });
-          const oldIndex = this.editingIndex;
-          this.editingIndex = null;
-          this.loadReminders();
-
-          // Scroll updated reminder into view
-          setTimeout(() => {
-            const updatedCard = document.querySelectorAll('.reminder-list .reminder-card')[oldIndex!];
-            updatedCard?.scrollIntoView({ behavior: 'smooth' });
-          }, 100);
-        });
-    }
-  }
-
-  deleteReminder(index: number) {
-    const reminder = this.reminders[index];
+  deleteReminder(reminder: Reminder) {
     if (!reminder._id) return;
-    this.http.delete(`${this.apiUrl}/${reminder._id}`)
-      .subscribe(() => this.loadReminders());
+    this.reminderService.deleteReminder(reminder._id).subscribe({
+      next: () => this.reminders = this.reminders.filter(r => r._id !== reminder._id),
+      error: (err) => console.error(err)
+    });
   }
 }
