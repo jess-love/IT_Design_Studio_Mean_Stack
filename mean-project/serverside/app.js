@@ -25,4 +25,28 @@ app.get('/', (req, res) => {
     res.send("Backend is running");
 });
 
+    //GOOGLE EVENT BUILDER FOR Assignment Tracker
+function buildassignmenttrackerGroupEvent(cls) {
+
+}
+
+    app.get('/assignmenttracker', (req, res) =>{
+        
+    });
+
+     app.get('/assignmenttracker/:id', (req, res) =>{
+        
+    });
+
+     app.post('/assignmenttracker/:id', async (req, res) =>{
+        
+    });
+
+     app.put('/assignmenttracker/:id', async (req, res) =>{
+        
+    });
+     app.delete('/assignmenttracker/:id', async (req, res) =>{
+        
+    });
+
 module.exports = app;
