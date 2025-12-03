@@ -5,6 +5,8 @@
   
 <h2> Please Input Your Class Information Below</h2>
 <h3> Students Please Input the Title of Course for Example: Introduction to History, and the Subject will Auto Fill </h3>
+<h3>Please Click the button below to save your schedule in Google Calendar before completing the form</h3>
+<button class ="btn" (click)="connectGoogle()"> Connect to Google Calendar</button>
 
 <form [formGroup]="assignmentForm" (ngSubmit)="onSubmit()">
   <label for="title">Course Name:</label>
