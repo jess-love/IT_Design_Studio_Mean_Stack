@@ -9,7 +9,6 @@ export interface StudyGroup {
   location: string;
   studyDate: string;
   studyTime: string;
-  userId: string;
 }
 
 @Injectable({
