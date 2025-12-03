@@ -6,7 +6,8 @@ const assignmentSchema = new mongoose.Schema({
     dueDate: String,
     subject: String,
     priority: String,
-    status: String
+    status: String,
+    googleEventId: {type: String, default: null}
 });
 
 module.exports = mongoose.model('Assignment', assignmentSchema, 'assignments');

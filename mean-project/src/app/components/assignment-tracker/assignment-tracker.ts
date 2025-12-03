@@ -3,6 +3,7 @@ import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angula
 import { CommonModule } from '@angular/common';
 import { AssignmentService } from '../../assignment.service';
 
+
 @Component({
   selector: 'app-assignment-tracker',
   standalone: true,
@@ -150,6 +151,7 @@ export class AssignmentTracker implements OnInit {
       return;
     }
 
+
     this.assignmentService.deleteAssignment(assignment._id).subscribe({
       next: () => {
         console.log("Deleted from backend:", assignment._id);
@@ -170,4 +172,8 @@ export class AssignmentTracker implements OnInit {
       error: (err) => console.error("Delete error:", err)
     });
   }
+
+    connectGoogle(){
+        window.location.href ='http://localhost:8000/auth/google';
+}
 }
