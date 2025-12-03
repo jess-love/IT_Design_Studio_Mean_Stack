@@ -1,20 +1,22 @@
 .portal {
-  width: 90;              
+  width: 90%;              
   max-width: 1300px;       
   margin: 30px auto;
   font-family: var(--font-main);
+  text-align: center;  
 }
 
 .container {
   display: flex;
-  gap: 40px;              
+  gap: 40px;   
+  text-align: left;   
 }
 
 .form-section,
 .list-section {
   flex: 1;
   background-color: var(--background-light);
-  padding: 25px;
+  padding: 25px 35px;  
   border-radius: 12px;
   box-shadow: var(--card-shadow);
 }
@@ -39,6 +41,12 @@ select {
   font-size: 14px;
 }
 
+.form-section input,
+.form-section select {
+  width: 100%;
+  padding: 12px;
+  box-sizing: border-box; 
+}
 
 button {
   border: none;
@@ -46,6 +54,13 @@ button {
   border-radius: 8px;
   cursor: pointer;
   font-size: 14px;
+}
+
+.portal > .btn {
+  display: block;
+  margin: 0 auto 20px auto;
+  width: fit-content;   
+  text-align: center;
 }
 
 .btn,
@@ -58,7 +73,6 @@ button {
 .edit-btn:hover {
   background-color: var(--primary-color);
 }
-
 
 .secondary,
 .clear-btn,
@@ -74,7 +88,6 @@ button {
   color: black;
 }
 
-
 ul {
   list-style: none;
   padding: 0;
@@ -89,7 +102,6 @@ ul {
   box-shadow: var(--card-shadow);
 }
 
-
 .group-header {
   font-size: 18px;
   font-weight: bold;
@@ -97,13 +109,11 @@ ul {
   margin-bottom: 10px;
 }
 
-
 .group-details p {
   margin: 4px 0;
   font-size: 14px;
   color: var(--text-medium);
 }
-
 
 .group-actions {
   margin-top: 12px;
