@@ -23,7 +23,7 @@ app.use(bodyParser.json());
 
 
 // MongoDB Connection
-mongoose.connect('mongodb+srv://linda_1:ITDesignStudio@cluster0.4wsjtrm.mongodb.net/scholarPath?retryWrites=true&w=majority&appName=Cluster0')
+mongoose.connect('mongodb+srv://User:Password@cluster0.4wsjtrm.mongodb.net/?appName=Cluster0')
   .then(() => console.log("connected"))
   .catch(err => console.log("error connecting:", err));
 
@@ -142,6 +142,33 @@ function buildAssignmentTrackerEvent(assignment) {
   };
 }
 
+
+// ===================================================
+// GOOGLE EVENT BUILDER FOR REMINDER
+// ===================================================
+
+function buildReminderEvent(reminder) {
+
+  const [year, month, day] = reminder.date.split('-').map(Number);
+  const [hour, minute] = reminder.time.split(':').map(Number);
+
+  const start = new Date(year, month - 1, day, hour, minute, 0);
+  const end = new Date(start);
+  end.setMinutes(end.getMinutes() + 30); // 30-min duration
+
+  return {
+    summary: reminder.title,
+    description: reminder.description || "Scholar Path Reminder",
+    start: {
+      dateTime: start.toISOString(),
+      timeZone: "America/New_York"
+    },
+    end: {
+      dateTime: end.toISOString(),
+      timeZone: "America/New_York"
+    }
+  };
+}
 
 
 // ===================================================
@@ -264,31 +291,6 @@ app.delete('/class_schedules/:id', async (req, res) => {
   }
 });
 
-// ===================================================
-// GOOGLE EVENT BUILDER FOR REMINDER
-// ===================================================
-function buildReminderEvent(reminder) {
-
-  const [year, month, day] = reminder.date.split('-').map(Number);
-  const [hour, minute] = reminder.time.split(':').map(Number);
-
-  const start = new Date(year, month - 1, day, hour, minute, 0);
-  const end = new Date(start);
-  end.setMinutes(end.getMinutes() + 30); // 30-min duration
-
-  return {
-    summary: reminder.title,
-    description: reminder.description || "Scholar Path Reminder",
-    start: {
-      dateTime: start.toISOString(),
-      timeZone: "America/New_York"
-    },
-    end: {
-      dateTime: end.toISOString(),
-      timeZone: "America/New_York"
-    }
-  };
-}
 
 
 // ===================================================
@@ -554,7 +556,5 @@ app.delete('/assignments/:id', async (req, res) => {
   }
 });
 
-const PORT = 8000;
-app.listen(PORT, () => {
-  console.log(`Server running on http://localhost:${PORT}`);
-});
+
+module.exports = app;
