@@ -23,14 +23,12 @@ app.use(bodyParser.json());
 
 
 // MongoDB Connection
-mongoose.connect('mongodb+srv://user:password@cluster0.4wsjtrm.mongodb.net/?appName=Cluster0')
-    .then(() => { console.log("connected"); })
-    .catch(() => { console.log("error connecting"); });
+mongoose.connect('mongodb+srv://linda_1:ITDesignStudio@cluster0.4wsjtrm.mongodb.net/scholarPath?retryWrites=true&w=majority&appName=Cluster0')
+  .then(() => console.log("connected"))
+  .catch(err => console.log("error connecting:", err));
 
 // Google OAuth Routes
 app.use('/', calendarRoutes);
-
-
 
 
 // ===================================================
@@ -266,47 +264,118 @@ app.delete('/class_schedules/:id', async (req, res) => {
   }
 });
 
+// ===================================================
+// GOOGLE EVENT BUILDER FOR REMINDER
+// ===================================================
+function buildReminderEvent(reminder) {
+
+  const [year, month, day] = reminder.date.split('-').map(Number);
+  const [hour, minute] = reminder.time.split(':').map(Number);
+
+  const start = new Date(year, month - 1, day, hour, minute, 0);
+  const end = new Date(start);
+  end.setMinutes(end.getMinutes() + 30); // 30-min duration
+
+  return {
+    summary: reminder.title,
+    description: reminder.description || "Scholar Path Reminder",
+    start: {
+      dateTime: start.toISOString(),
+      timeZone: "America/New_York"
+    },
+    end: {
+      dateTime: end.toISOString(),
+      timeZone: "America/New_York"
+    }
+  };
+}
 
 
 // ===================================================
-// REMINDER ROUTES
+// REMINDER ROUTES + GOOGLE CALENDAR
 // ===================================================
+
+// CREATE REMINDER + GOOGLE CALENDAR
 app.post('/reminders', async (req, res) => {
   try {
     const reminder = new Reminder(req.body);
     await reminder.save();
-    res.status(201).send(reminder);
+
+    const token = tokenStore.getToken();
+    if (token) {
+      try {
+        const eventDetails = buildReminderEvent(reminder);
+        const eventId = await calendarService.createEvent(token, eventDetails);
+        reminder.googleEventId = eventId;
+        await reminder.save();
+      } catch (err) {
+        console.error("Google Calendar Create Error:", err);
+      }
+    }
+
+    res.status(201).json(reminder);
   } catch (err) {
-    res.status(400).send(err);
+    res.status(400).json(err);
   }
 });
 
+// GET ALL REMINDERS
 app.get('/reminders', async (req, res) => {
   try {
     const reminders = await Reminder.find();
-    res.send(reminders);
+    res.json(reminders);
   } catch (err) {
-    res.status(400).send(err);
+    res.status(400).json(err);
   }
 });
 
+// UPDATE REMINDER + GOOGLE CALENDAR
 app.put('/reminders/:id', async (req, res) => {
   try {
-    const updated = await Reminder.findByIdAndUpdate(req.params.id, req.body, { new: true });
-    res.send(updated);
+    const reminder = await Reminder.findByIdAndUpdate(
+      req.params.id,
+      req.body,
+      { new: true }
+    );
+
+    const token = tokenStore.getToken();
+    if (token && reminder.googleEventId) {
+      try {
+        const eventDetails = buildReminderEvent(reminder);
+        await calendarService.updateEvent(token, reminder.googleEventId, eventDetails);
+      } catch (err) {
+        console.error("Google Calendar Update Error:", err);
+      }
+    }
+
+    res.json(reminder);
   } catch (err) {
-    res.status(400).send(err);
+    res.status(400).json(err);
   }
 });
 
+// DELETE REMINDER + GOOGLE CALENDAR
 app.delete('/reminders/:id', async (req, res) => {
   try {
+    const reminder = await Reminder.findById(req.params.id);
+
+    const token = tokenStore.getToken();
+    if (token && reminder && reminder.googleEventId) {
+      try {
+        await calendarService.deleteEvent(token, reminder.googleEventId);
+      } catch (err) {
+        console.error("Google Calendar Delete Error:", err);
+      }
+    }
+
     await Reminder.findByIdAndDelete(req.params.id);
-    res.send({ message: 'Reminder deleted' });
+    res.json({ message: "Reminder deleted" });
+
   } catch (err) {
-    res.status(400).send(err);
+    res.status(400).json(err);
   }
 });
+
 
 
 // ===================================================
@@ -484,6 +553,5 @@ app.delete('/assignments/:id', async (req, res) => {
     res.status(500).send(err);
   }
 });
-
 
 module.exports = app;
