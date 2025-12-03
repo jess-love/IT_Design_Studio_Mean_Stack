@@ -1,0 +1,69 @@
+<div class="portal">
+  <h1>Study Group Portal</h1>
+  <button class="btn" (click)="connectGoogle()">Connect Google Calendar</button>
+
+  <div class="container">
+
+  
+    <div class="form-section">
+      <form (ngSubmit)="onSubmit()" #groupForm="ngForm">
+
+        <label>Group Name:</label>
+        <input [(ngModel)]="currentGroup.groupName" name="groupName" required>
+
+        <label>Course:</label>
+        <input [(ngModel)]="currentGroup.course" name="course" required>
+
+        <label>Location:</label>
+        <input [(ngModel)]="currentGroup.location" name="location" required>
+
+      
+        <label>Study Date:</label>
+        <input type="date" [(ngModel)]="currentGroup.studyDate" name="studyDate" required>
+
+      
+        <label>Study Time:</label>
+        <input type="time" [(ngModel)]="currentGroup.studyTime" name="studyTime" required>
+
+        <label>User ID:</label>
+        <input [(ngModel)]="currentGroup.userId" name="userId" required>
+
+        <button type="submit" class="btn primary">
+          {{ currentGroup._id ? 'Update' : 'Create' }} Study Group
+        </button>
+
+        <button type="button" class="btn secondary" (click)="resetForm()">Clear</button>
+
+      </form>
+    </div>
+
+    <div class="list-section">
+      <h2>Available Study Groups</h2>
+
+      <ul>
+        <li *ngFor="let group of groups" class="group-item">
+
+          <div class="group-header">
+            <strong>{{ group.groupName }}</strong>
+          </div>
+
+          <div class="group-details">
+            <p><strong>Course:</strong> {{ group.course }}</p>
+            <p><strong>Location:</strong> {{ group.location }}</p>
+
+            <p><strong>Date:</strong> {{ group.studyDate }}</p>
+
+            <p><strong>Time:</strong> {{ convertTo12Hour(group.studyTime) }}</p>
+          </div>
+
+          <div class="group-actions">
+            <button class="edit-btn" (click)="editGroup(group)">Edit</button>
+            <button class="delete-btn" (click)="deleteGroup(group._id!)">Delete</button>
+          </div>
+
+        </li>
+      </ul>
+
+    </div>
+  </div>
+</div>

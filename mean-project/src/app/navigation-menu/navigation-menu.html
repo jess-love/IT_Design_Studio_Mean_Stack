@@ -1,0 +1,29 @@
+
+<nav class="nav-bar">
+  <div class="nav-title">Scholar Path</div>
+
+  <div class="nav-menu">
+    <button mat-raised-button color="primary" [matMenuTriggerFor]="menu">
+      Menu
+    </button>
+
+    <mat-menu #menu="matMenu" class="custom-menu">
+      <button mat-menu-item routerLink="/home">
+        Home Page
+      </button>
+      <button mat-menu-item routerLink="/addClassSchedule">
+        ➕ Add Schedule
+      </button>
+      <button mat-menu-item routerLink="/study-groups">
+        ➕ Add Study Group
+      </button>
+      <button mat-menu-item routerLink="/reminder">
+        ➕ Add Reminder
+      </button>
+      <button mat-menu-item routerLink="/assignment">
+        ➕ Add Assignment
+      </button>
+    </mat-menu>
+  </div>
+</nav>
+

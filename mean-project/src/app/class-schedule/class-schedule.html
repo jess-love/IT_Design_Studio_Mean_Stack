@@ -1,0 +1,80 @@
+<div class="page-header">
+  <h2>{{ subtitle() }}</h2> 
+  <h3>Please fill out your class information</h3>
+  <h3>Click the button below to save your schedule in Google Calendar before filling the form.</h3>
+  <button class="btn" (click)="connectGoogle()">Connect to Google Calendar</button>
+</div>
+
+<div class="form-container">
+  <form [formGroup]="classForm" (ngSubmit)="onSubmitOrAdd()">
+
+    <h1>Schedule Form</h1>
+
+    <div class="form-group">
+      <label for="className">Class Name</label>
+      <input id="className" type="text" formControlName="className" required />
+
+      <label for="professor">Professor</label>
+      <input id="professor" type="text" formControlName="professor" />
+
+      <label for="day">Day</label>
+      <select id="day" formControlName="day" required>
+        <option value="">Select a Day</option>
+        <option *ngFor="let day of daysOfWeek" [value]="day">{{ day }}</option>
+      </select>
+
+      <label for="time">Time</label>
+      <select id="time" formControlName="time" required>
+        <option value="">Select a Time</option>
+        <option *ngFor="let time of timesOfDay" [value]="time">{{ time }}</option>
+      </select>
+    </div>
+
+    <button class="submit-btn" type="submit" [disabled]="!classForm.valid">
+      {{ editIndex !== null ? 'Update Class' : 'Add Class' }}
+    </button>
+
+    <p class="status">Form Status: {{ classForm.status }}</p>
+  </form>
+
+  <div *ngIf="message()" class="message">
+    {{ message() }}
+  </div>
+</div>
+
+<!-- Class Schedule List -->
+<div class="form-container">
+  <h1>Class Schedules</h1>
+
+  <table *ngIf="classSchedules && classSchedules.length > 0; else noData" border="1" class="schedule-table">
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>Class Name</th>
+        <th>Professor</th>
+        <th>Day</th>
+        <th>Time</th>
+        <th>Action</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let classSchedule of classSchedules; let i = index">
+        <td>{{ i + 1 }}</td>
+        <td>{{ classSchedule.className }}</td>
+        <td>{{ classSchedule.professor }}</td>
+        <td>{{ classSchedule.day }}</td>
+        <!-- <td>{{ classSchedule.time }}</td> -->
+        <td>{{ convertTo12Hour(classSchedule.time) }}</td>
+
+        <td>
+          <button type="button" (click)="editClass(i)">Update</button>
+          <button type="button" (click)="removeClass(i)">Remove</button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <ng-template #noData>
+    <p class="no-data">No class schedules available.</p>
+  </ng-template>
+</div>
