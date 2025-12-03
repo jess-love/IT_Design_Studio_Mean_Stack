@@ -7,7 +7,7 @@ import { Reminder } from './reminder.component';
   providedIn: 'root'
 })
 export class ReminderService {
-  private apiUrl = 'http://localhost:3000/reminders'; 
+  private apiUrl = 'http://localhost:8000/reminders'; 
   constructor(private http: HttpClient) { }
 
   getReminders(): Observable<Reminder[]> {
