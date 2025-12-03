@@ -25,9 +25,6 @@
         <label>Study Time:</label>
         <input type="time" [(ngModel)]="currentGroup.studyTime" name="studyTime" required>
 
-        <label>User ID:</label>
-        <input [(ngModel)]="currentGroup.userId" name="userId" required>
-
         <button type="submit" class="btn primary">
           {{ currentGroup._id ? 'Update' : 'Create' }} Study Group
         </button>
