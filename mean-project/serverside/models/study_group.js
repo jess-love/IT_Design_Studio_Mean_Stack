@@ -8,7 +8,6 @@ const StudyGroupSchema = new mongoose.Schema({
     studyDate: { type: String, required: true },  
     studyTime: { type: String, required: true },  
 
-    userId: { type: String, required: true },
     googleEventId: { type: String }
 });
 

@@ -21,7 +21,6 @@ export class StudyGroup {
     location: '',
     studyDate: '',
     studyTime: '',
-    userId: ''
   };
 
   constructor(private studyGroupService: StudyGroupService) {}
@@ -86,7 +85,6 @@ export class StudyGroup {
       location: '',
       studyDate: '',
       studyTime: '',
-      userId: ''
     };
   }
 }

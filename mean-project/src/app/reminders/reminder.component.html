@@ -1,5 +1,7 @@
 <div class="reminder-page">
   <h2>Reminders Form</h2>
+  <h3>Click the button below to save your reminder's information in Google Calendar before filling the form.</h3>
+  <button class="btn" (click)="connectGoogle()">Connect to Google Calendar</button>
 
   <form class="reminder-form" [formGroup]="reminderForm" (ngSubmit)="submitReminder()">
     <label>Title:</label>

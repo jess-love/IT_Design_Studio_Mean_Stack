@@ -31,8 +31,6 @@ mongoose.connect('mongodb+srv://linda_1:ITDesignStudio@cluster0.4wsjtrm.mongodb.
 app.use('/', calendarRoutes);
 
 
-
-
 // ===================================================
 // GOOGLE EVENT BUILDER FOR STUDY GROUP
 // ===================================================
@@ -109,6 +107,42 @@ function buildClassScheduleGroupEvent(cls) {
 }
 
 
+// ===================================================
+// GOOGLE EVENT BUILDER FOR Assignment Tracker
+// ===================================================
+
+function buildAssignmentTrackerEvent(assignment) {
+
+  if (!assignment.dueDate.includes('T')) {
+    return {
+      summary: `Assignment: ${assignment.title}`,
+      description: `Subject: ${assignment.subject}\nPriority: ${assignment.priority}\nStatus: ${assignment.status}\n\n${assignment.description || ''}`,
+      start: {
+        date: assignment.dueDate,      
+        timeZone: "America/New_York"
+      },
+      end: {
+        date: assignment.dueDate,     
+        timeZone: "America/New_York"
+      }
+    };
+  }
+
+  return {
+    summary: `Assignment: ${assignment.title}`,
+    description: `Subject: ${assignment.subject}\nPriority: ${assignment.priority}\nStatus: ${assignment.status}\n\n${assignment.description || ''}`,
+    start: {
+      dateTime: assignment.dueDate,     
+      timeZone: "America/New_York"
+    },
+    end: {
+      dateTime: assignment.dueDate,       
+      timeZone: "America/New_York"
+    }
+  };
+}
+
+
 
 // ===================================================
 // CLASS SCHEDULE ROUTES + GOOGLE CALENDAR
@@ -164,7 +198,6 @@ app.post('/class_schedules', async (req, res) => {
     res.status(500).json({ message: "Server error while saving class schedule", error: err });
   }
 });
-
 
 app.put('/class_schedules/:id', async (req, res) => {
   try {
@@ -257,6 +290,7 @@ function buildReminderEvent(reminder) {
   };
 }
 
+
 // ===================================================
 // REMINDER ROUTES + GOOGLE CALENDAR
 // ===================================================
@@ -342,6 +376,8 @@ app.delete('/reminders/:id', async (req, res) => {
   }
 });
 
+
+
 // ===================================================
 // STUDY GROUP ROUTES + GOOGLE CALENDAR
 // ===================================================
@@ -417,7 +453,7 @@ app.delete('/studygroups/:id', async (req, res) => {
 
 
 // ===================================================
-// ASSIGNMENTS
+// ASSIGNMENTS + GOOGLE CALENDAR
 // ===================================================
 app.get('/assignments', async (req, res) => {
   try {
@@ -430,9 +466,27 @@ app.get('/assignments', async (req, res) => {
 
 app.post('/assignments', async (req, res) => {
   try {
-    const newAssignment = new Assignment(req.body);
-    await newAssignment.save();
-    res.json(newAssignment);
+    const assignment = new Assignment(req.body);
+    await assignment.save();
+
+    const token = tokenStore.getToken();
+    if (token) {
+      try {
+        const eventDetails = buildAssignmentTrackerEvent(assignment);
+        const eventId = await calendarService.createEvent(token, eventDetails);
+        assignment.googleEventId = eventId;
+        await assignment.save();
+      } catch (gcalErr) {
+        console.error("Google Calendar error:", gcalErr);
+        return res.status(500).json({
+          message: "Saved in DB but failed to create Google Calendar event",
+          error: gcalErr
+        });
+      }
+    }
+
+    res.status(201).json(assignment);
+
   } catch (err) {
     res.status(500).send(err);
   }
@@ -440,8 +494,31 @@ app.post('/assignments', async (req, res) => {
 
 app.put('/assignments/:id', async (req, res) => {
   try {
-    const updated = await Assignment.findByIdAndUpdate(req.params.id, req.body, { new: true });
-    res.json(updated);
+    const assignment = await Assignment.findByIdAndUpdate(
+      req.params.id,
+      req.body,
+      { new: true }
+    );
+
+    if (!assignment) return res.status(404).json({ message: "Assignment not found" });
+
+    const token = tokenStore.getToken();
+
+    if (token && assignment.googleEventId) {
+      try {
+        const eventDetails = buildAssignmentTrackerEvent(assignment);
+        await calendarService.updateEvent(token, assignment.googleEventId, eventDetails);
+      } catch (gcalErr) {
+        console.error("Google Calendar update error:", gcalErr);
+        return res.status(500).json({
+          message: "Updated in DB but failed to update Google Calendar event",
+          error: gcalErr
+        });
+      }
+    }
+
+    res.json(assignment);
+
   } catch (err) {
     res.status(500).send(err);
   }
@@ -449,16 +526,32 @@ app.put('/assignments/:id', async (req, res) => {
 
 app.delete('/assignments/:id', async (req, res) => {
   try {
+    const assignment = await Assignment.findById(req.params.id);
+
+    if (!assignment) {
+      return res.status(404).json({ message: "Assignment not found" });
+    }
+
+    const token = tokenStore.getToken();
+    if (token && assignment.googleEventId) {
+      try {
+        await calendarService.deleteEvent(token, assignment.googleEventId);
+      } catch (gcalErr) {
+        console.error("Google Calendar delete error:", gcalErr);
+        return res.status(500).json({
+          message: "Deleted in DB but failed to delete Google Calendar event",
+          error: gcalErr
+        });
+      }
+    }
+
     await Assignment.findByIdAndDelete(req.params.id);
-    res.json({ message: "Deleted" });
+
+    res.json({ message: "Assignment deleted successfully" });
+
   } catch (err) {
     res.status(500).send(err);
   }
 });
 
 module.exports = app;
-
-const PORT = 3000;
-app.listen(PORT, () => {
-  console.log(`Server running on http://localhost:${PORT}`);
-});

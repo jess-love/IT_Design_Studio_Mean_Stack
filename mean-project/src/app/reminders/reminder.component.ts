@@ -40,6 +40,10 @@ export class ReminderComponent implements OnInit {
     this.loadReminders();
   }
 
+  connectGoogle() {
+    window.location.href = 'http://localhost:8000/auth/google';
+  }
+
   loadReminders() {
     this.reminderService.getReminders().subscribe({
       next: (data) => this.reminders = data,
